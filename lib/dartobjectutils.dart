@@ -3,3 +3,5 @@ library;
 
 // Exporting the functions directly.
 export 'src/dartobjectutils_base.dart';
+// Exporting the errors.
+export 'src/errors.dart';
