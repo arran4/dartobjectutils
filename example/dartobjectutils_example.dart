@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dartobjectutils/dartobjectutils.dart';
 
 // 1. Define your data models
@@ -23,6 +24,7 @@ class User {
   final Address address;
   final List<String> tags;
   final List<Address> prevAddresses;
+  final Map<String, int> scores;
 
   User(Map<String, dynamic> json)
       : name = getStringPropOrThrow(json, 'name'),
@@ -43,13 +45,16 @@ class User {
           'prevAddresses',
           (j) => Address(j),
           <Address>[],
-        )!; // ! is safe because we provide a non-null default value
+        )!, // ! is safe because we provide a non-null default value
+        // Explicitly specify generics for type safety when extracting Maps
+        scores = getMapPropOrDefault<String, int, Map<String, int>>(
+            json, 'scores', <String, int>{});
 
   @override
   String toString() {
     return 'User(name: $name, age: $age, isActive: $isActive, '
         'address: [$address], tags: $tags, '
-        'prevAddresses: $prevAddresses)';
+        'prevAddresses: $prevAddresses, scores: $scores)';
   }
 }
 
@@ -70,7 +75,8 @@ void main() {
     'prevAddresses': [
       {'street': '456 Old St', 'city': 'OldTown', 'zip': '67890'},
       {'street': '789 Unknown St', 'city': 'Nowhere'}
-    ]
+    ],
+    'scores': {'math': 95, 'science': 88}
   };
 
   print('\n1. Parsing Valid User:');
@@ -115,5 +121,43 @@ void main() {
     print(user);
   } catch (e) {
     print('Caught expected error: $e');
+  }
+
+  // Case 4: JSON String from API
+  print('\n4. Parsing JSON String (simulating API response):');
+  const jsonString = '''
+  {
+    "name": "David",
+    "age": "45",
+    "isActive": 1,
+    "address": {
+      "street": "101 Binary Blvd",
+      "city": "Cyberspace",
+      "zip": 10101
+    },
+    "tags": ["bot", "ai"],
+    "scores": {"coding": 100}
+  }
+  ''';
+
+  try {
+    final Map<String, dynamic> decoded = jsonDecode(jsonString);
+
+    // Demonstration of manual extraction before creating the object
+    print('Decoded name: ${getStringPropOrThrow(decoded, "name")}');
+    print('Decoded age: ${getNumberPropOrThrow(decoded, "age")}'); // Auto converts string "45" to num
+
+    // Custom handling for boolean if API returns 0/1 instead of true/false
+    final isActive = getBooleanFunctionPropOrDefault(
+        decoded, 'isActive', (v) => v == 1 || v == true, false);
+    print('Decoded isActive (custom logic): $isActive');
+
+    // Create User object
+    // Note: User class uses strict boolean parsing by default, so "isActive": 1 might result in false
+    // unless the User class logic is updated to handle numbers.
+    final user = User(decoded);
+    print('User object: $user');
+  } catch (e) {
+    print('Error parsing JSON string: $e');
   }
 }
