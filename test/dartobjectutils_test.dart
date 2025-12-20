@@ -128,6 +128,21 @@ void main() {
       expect(dates[0], DateTime(2023, 1, 1));
       expect(dates[1], DateTime(2023, 1, 2));
     });
+
+    test('getNumberArrayPropOrThrow', () {
+      final nums = getNumberArrayPropOrThrow({'nums': [1, 2.5, '3']}, 'nums');
+      expect(nums, [1, 2.5, 3]);
+    });
+
+    test('getBigIntArrayPropOrThrow', () {
+      final bigInts = getBigIntArrayPropOrThrow({'bigInts': [BigInt.one, 2, '3']}, 'bigInts');
+      expect(bigInts, [BigInt.one, BigInt.from(2), BigInt.from(3)]);
+    });
+
+    test('getBooleanArrayPropOrThrow', () {
+      final bools = getBooleanArrayPropOrThrow({'bools': [true, false]}, 'bools');
+      expect(bools, [true, false]);
+    });
   });
 
   group('Object Tests', () {

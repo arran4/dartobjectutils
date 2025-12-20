@@ -702,3 +702,125 @@ Y getObjectPropOrDefaultFunctionAllowNull<Y>(
   } catch (_) {}
   return defaultValue();
 }
+// --- Number Array ---
+
+R getNumberArrayPropOrDefault<R>(
+    Map<String, dynamic>? props, String prop, R defaultValue) {
+  try {
+    final res = getNumberArrayPropOrThrow(props, prop);
+    return res as R;
+  } catch (_) {}
+  return defaultValue;
+}
+
+R getNumberArrayPropOrDefaultFunction<R>(
+    Map<String, dynamic>? props, String prop, R Function() defaultFunction) {
+  try {
+    final res = getNumberArrayPropOrThrow(props, prop);
+    return res as R;
+  } catch (_) {}
+  return defaultFunction();
+}
+
+List<num> getNumberArrayPropOrThrow(
+    Map<String, dynamic>? props, String prop,
+    {String? message}) {
+  if (props != null) {
+    if (props.containsKey(prop)) {
+      final v = props[prop];
+      if (v is List) {
+        return v.map((e) {
+          if (e is num) return e;
+          if (e is String) {
+             final n = num.tryParse(e);
+             if (n != null) return n;
+          }
+          throw ArgumentError('Element $e is not a number');
+        }).toList();
+      }
+    }
+  }
+  throw ArgumentError(
+      message ?? '$prop not found as number[] in ${props.runtimeType}');
+}
+
+// --- BigInt Array ---
+
+R getBigIntArrayPropOrDefault<R>(
+    Map<String, dynamic>? props, String prop, R defaultValue) {
+  try {
+    final res = getBigIntArrayPropOrThrow(props, prop);
+    return res as R;
+  } catch (_) {}
+  return defaultValue;
+}
+
+R getBigIntArrayPropOrDefaultFunction<R>(
+    Map<String, dynamic>? props, String prop, R Function() defaultFunction) {
+  try {
+    final res = getBigIntArrayPropOrThrow(props, prop);
+    return res as R;
+  } catch (_) {}
+  return defaultFunction();
+}
+
+List<BigInt> getBigIntArrayPropOrThrow(
+    Map<String, dynamic>? props, String prop,
+    {String? message}) {
+  if (props != null) {
+    if (props.containsKey(prop)) {
+      final v = props[prop];
+      if (v is List) {
+        return v.map((e) {
+          if (e is BigInt) return e;
+          if (e is num) return BigInt.from(e);
+          if (e is String) {
+            final b = BigInt.tryParse(e);
+            if (b != null) return b;
+          }
+          throw ArgumentError('Element $e is not a BigInt');
+        }).toList();
+      }
+    }
+  }
+  throw ArgumentError(
+      message ?? '$prop not found as BigInt[] in ${props.runtimeType}');
+}
+
+// --- Boolean Array ---
+
+R getBooleanArrayPropOrDefault<R>(
+    Map<String, dynamic>? props, String prop, R defaultValue) {
+  try {
+    final res = getBooleanArrayPropOrThrow(props, prop);
+    return res as R;
+  } catch (_) {}
+  return defaultValue;
+}
+
+R getBooleanArrayPropOrDefaultFunction<R>(
+    Map<String, dynamic>? props, String prop, R Function() defaultFunction) {
+  try {
+    final res = getBooleanArrayPropOrThrow(props, prop);
+    return res as R;
+  } catch (_) {}
+  return defaultFunction();
+}
+
+List<bool> getBooleanArrayPropOrThrow(
+    Map<String, dynamic>? props, String prop,
+    {String? message}) {
+  if (props != null) {
+    if (props.containsKey(prop)) {
+      final v = props[prop];
+      if (v is List) {
+        return v.map((e) {
+          if (e is bool) return e;
+          throw ArgumentError('Element $e is not a boolean');
+        }).toList();
+      }
+    }
+  }
+  throw ArgumentError(
+      message ?? '$prop not found as boolean[] in ${props.runtimeType}');
+}
