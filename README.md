@@ -113,6 +113,7 @@ dart test
 
 * [repository](https://github.com/arran4/dartobjectutils)
 * [TS version](https://github.com/arran4/tsobjectutils)
+* [Go version](https://github.com/arran4/go-objectutils)
 
 ## Definitions
 
