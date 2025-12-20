@@ -1,4 +1,4 @@
-/// Helper functions to safely extract values from untyped objects (Map<String, dynamic>).
+/// Helper functions to safely extract values from untyped objects (`Map<String, dynamic>`).
 library;
 
 // Exporting the functions directly.
