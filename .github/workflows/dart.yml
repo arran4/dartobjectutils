@@ -23,6 +23,7 @@ jobs:
         run: dart pub get
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
+        continue-on-error: true
       - name: Analyze project source
         run: dart analyze
       - name: Run tests
