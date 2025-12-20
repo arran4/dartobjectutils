@@ -8,8 +8,14 @@ void main() {
     test('getStringPropOrThrow', () {
       expect(getStringPropOrThrow(map, 'str'), 'hello');
       expect(getStringPropOrThrow(map, 'num'), '123');
-      expect(() => getStringPropOrThrow(map, 'missing'), throwsArgumentError);
-      expect(() => getStringPropOrThrow(map, 'null'), throwsArgumentError);
+      expect(
+        () => getStringPropOrThrow(map, 'missing'),
+        throwsA(isA<MissingOrInvalidPropertyException>()),
+      );
+      expect(
+        () => getStringPropOrThrow(map, 'null'),
+        throwsA(isA<MissingOrInvalidPropertyException>()),
+      );
     });
 
     test('getStringPropOrDefault', () {
@@ -38,8 +44,14 @@ void main() {
       expect(getNumberPropOrThrow<int>(map, 'strInt'), 456);
       expect(getNumberPropOrThrow<double>(map, 'strDouble'), 456.78);
 
-      expect(() => getNumberPropOrThrow(map, 'missing'), throwsArgumentError);
-      expect(() => getNumberPropOrThrow(map, 'invalid'), throwsArgumentError);
+      expect(
+        () => getNumberPropOrThrow(map, 'missing'),
+        throwsA(isA<MissingOrInvalidPropertyException>()),
+      );
+      expect(
+        () => getNumberPropOrThrow(map, 'invalid'),
+        throwsA(isA<MissingOrInvalidPropertyException>()),
+      );
     });
 
     test('getNumberPropOrDefault', () {
@@ -54,9 +66,15 @@ void main() {
     test('getBooleanPropOrThrow', () {
       expect(getBooleanPropOrThrow(map, 'true'), true);
       expect(getBooleanPropOrThrow(map, 'false'), false);
-      expect(() => getBooleanPropOrThrow(map, 'missing'), throwsArgumentError);
+      expect(
+        () => getBooleanPropOrThrow(map, 'missing'),
+        throwsA(isA<MissingOrInvalidPropertyException>()),
+      );
       // strTrue is string, not boolean, so should throw unless constructorFunc
-      expect(() => getBooleanPropOrThrow(map, 'strTrue'), throwsArgumentError);
+      expect(
+        () => getBooleanPropOrThrow(map, 'strTrue'),
+        throwsA(isA<MissingOrInvalidPropertyException>()),
+      );
     });
 
     test('getBooleanPropOrThrow with constructorFunc', () {
