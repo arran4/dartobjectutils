@@ -3,11 +3,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('String Tests', () {
-    final map = {
-      'str': 'hello',
-      'num': 123,
-      'null': null,
-    };
+    final map = {'str': 'hello', 'num': 123, 'null': null};
 
     test('getStringPropOrThrow', () {
       expect(getStringPropOrThrow(map, 'str'), 'hello');
@@ -38,10 +34,10 @@ void main() {
       // Conversions
       expect(getNumberPropOrThrow<double>(map, 'int'), 123.0);
       expect(getNumberPropOrThrow<int>(map, 'double'), 123); // truncates?
-      
+
       expect(getNumberPropOrThrow<int>(map, 'strInt'), 456);
       expect(getNumberPropOrThrow<double>(map, 'strDouble'), 456.78);
-      
+
       expect(() => getNumberPropOrThrow(map, 'missing'), throwsArgumentError);
       expect(() => getNumberPropOrThrow(map, 'invalid'), throwsArgumentError);
     });
@@ -53,11 +49,7 @@ void main() {
   });
 
   group('Boolean Tests', () {
-    final map = {
-      'true': true,
-      'false': false,
-      'strTrue': 'true',
-    };
+    final map = {'true': true, 'false': false, 'strTrue': 'true'};
 
     test('getBooleanPropOrThrow', () {
       expect(getBooleanPropOrThrow(map, 'true'), true);
@@ -66,9 +58,16 @@ void main() {
       // strTrue is string, not boolean, so should throw unless constructorFunc
       expect(() => getBooleanPropOrThrow(map, 'strTrue'), throwsArgumentError);
     });
-    
+
     test('getBooleanPropOrThrow with constructorFunc', () {
-       expect(getBooleanPropOrThrow(map, 'strTrue', constructorFunc: (v) => v == 'true'), true);
+      expect(
+        getBooleanPropOrThrow(
+          map,
+          'strTrue',
+          constructorFunc: (v) => v == 'true',
+        ),
+        true,
+      );
     });
 
     test('getBooleanPropOrDefault', () {
@@ -106,8 +105,11 @@ void main() {
     });
 
     test('getDatePropOrDefault', () {
-       expect(getDatePropOrDefault<DateTime>(map, 'date', DateTime(2000)), now);
-       expect(getDatePropOrDefault<DateTime>(map, 'missing', DateTime(2000)), DateTime(2000));
+      expect(getDatePropOrDefault<DateTime>(map, 'date', DateTime(2000)), now);
+      expect(
+        getDatePropOrDefault<DateTime>(map, 'missing', DateTime(2000)),
+        DateTime(2000),
+      );
     });
   });
 
@@ -120,50 +122,65 @@ void main() {
     test('getStringArrayPropOrThrow', () {
       expect(getStringArrayPropOrThrow(map, 'strs'), ['a', 'b', '1']);
     });
-    
+
     test('getDateArrayPropOrThrow', () {
-       final dates = getDateArrayPropOrThrow(map, 'dates');
-       expect(dates[0], DateTime(2023, 1, 1));
-       expect(dates[1], DateTime(2023, 1, 2));
+      final dates = getDateArrayPropOrThrow(map, 'dates');
+      expect(dates[0], DateTime(2023, 1, 1));
+      expect(dates[1], DateTime(2023, 1, 2));
     });
   });
 
   group('Object Tests', () {
-     final map = {
-       'obj': {'id': 1},
-       'objs': [{'id': 1}, {'id': 2}]
-     };
-     
-     test('getObjectPropOrThrow', () {
-        final obj = getObjectPropOrThrow<Map<String, dynamic>>(map, 'obj');
-        expect(obj['id'], 1);
-     });
-     
-     test('getObjectFunctionPropOrThrow', () {
-         final obj = getObjectFunctionPropOrThrow<int>(map, 'obj', (p) => p['id'] as int);
-         expect(obj, 1);
-     });
+    final map = {
+      'obj': {'id': 1},
+      'objs': [
+        {'id': 1},
+        {'id': 2},
+      ],
+    };
 
-     test('getObjectArrayPropOrThrow', () {
-         final list = getObjectArrayPropOrThrow<Map<String, dynamic>, List<Map<String, dynamic>>>(map, 'objs');
-         expect(list.length, 2);
-         expect(list[0]['id'], 1);
-     });
-     
-     test('getObjectArrayFunctionPropOrThrow', () {
-         final list = getObjectArrayFunctionPropOrThrow<int, List<int>>(map, 'objs', (p) => p['id'] as int);
-         expect(list, [1, 2]);
-     });
+    test('getObjectPropOrThrow', () {
+      final obj = getObjectPropOrThrow<Map<String, dynamic>>(map, 'obj');
+      expect(obj['id'], 1);
+    });
+
+    test('getObjectFunctionPropOrThrow', () {
+      final obj = getObjectFunctionPropOrThrow<int>(
+        map,
+        'obj',
+        (p) => p['id'] as int,
+      );
+      expect(obj, 1);
+    });
+
+    test('getObjectArrayPropOrThrow', () {
+      final list =
+          getObjectArrayPropOrThrow<
+            Map<String, dynamic>,
+            List<Map<String, dynamic>>
+          >(map, 'objs');
+      expect(list.length, 2);
+      expect(list[0]['id'], 1);
+    });
+
+    test('getObjectArrayFunctionPropOrThrow', () {
+      final list = getObjectArrayFunctionPropOrThrow<int, List<int>>(
+        map,
+        'objs',
+        (p) => p['id'] as int,
+      );
+      expect(list, [1, 2]);
+    });
   });
-  
+
   group('Map Tests', () {
-     final map = {
-        'map': {'a': 1, 'b': 2}
-     };
-     
-     test('getMapPropOrThrow', () {
-        final m = getMapPropOrThrow<String, int>(map, 'map');
-        expect(m, {'a': 1, 'b': 2});
-     });
+    final map = {
+      'map': {'a': 1, 'b': 2},
+    };
+
+    test('getMapPropOrThrow', () {
+      final m = getMapPropOrThrow<String, int>(map, 'map');
+      expect(m, {'a': 1, 'b': 2});
+    });
   });
 }

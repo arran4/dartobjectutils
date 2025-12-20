@@ -1,6 +1,7 @@
 import 'package:dartobjectutils/dartobjectutils.dart';
 
 void main() {
-  var awesome = Awesome();
-  print('awesome: ${awesome.isAwesome}');
+  var map = {'key': 'value'};
+  var val = getStringPropOrDefault(map, 'key', 'default');
+  print('value: $val');
 }

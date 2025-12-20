@@ -10,14 +10,17 @@ typedef ConstructorFuncAllowNull<Y> = Y Function(Map<String, dynamic>? params);
 
 /// Retrieves a string property from a map, or returns a default value if not found or type mismatch.
 R getStringPropOrDefault<R extends String?>(
-    Map<String, dynamic>? props, String prop, R defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  R defaultValue,
+) {
   // We can't use the closure () => defaultValue with generic R easily in Dart if the return type of the closure matters for inference in a way that Dart gets confused.
   // But actually, the issue might be that I'm passing a closure () => defaultValue
   // into a function that expects R Function(). And R extends String?.
   // The error says "A value of type 'R' can't be returned from a function with return type 'Never'".
   // This implies that Dart inferred the return type of the closure as 'Never' for some reason?
   // Or maybe it inferred R as Never? No.
-  
+
   // Let's implement it directly to avoid the closure issue.
   try {
     return getStringPropOrThrow<R>(props, prop);
@@ -28,7 +31,10 @@ R getStringPropOrDefault<R extends String?>(
 
 /// Retrieves a string property from a map, or returns the result of a default function if not found or type mismatch.
 R getStringPropOrDefaultFunction<R extends String?>(
-    Map<String, dynamic>? props, String prop, R Function() defaultFunction) {
+  Map<String, dynamic>? props,
+  String prop,
+  R Function() defaultFunction,
+) {
   try {
     return getStringPropOrThrow<R>(props, prop);
   } catch (_) {
@@ -38,8 +44,10 @@ R getStringPropOrDefaultFunction<R extends String?>(
 
 /// Retrieves a string property from a map, or throws an error if not found or type mismatch.
 R getStringPropOrThrow<R extends String?>(
-    Map<String, dynamic>? props, String prop,
-    {String? message}) {
+  Map<String, dynamic>? props,
+  String prop, {
+  String? message,
+}) {
   if (props != null) {
     if (props.containsKey(prop)) {
       final v = props[prop];
@@ -52,7 +60,8 @@ R getStringPropOrThrow<R extends String?>(
     }
   }
   throw ArgumentError(
-      message ?? '$prop not found as string in ${props.runtimeType}');
+    message ?? '$prop not found as string in ${props.runtimeType}',
+  );
 }
 
 // --- Number (int/double) ---
@@ -60,7 +69,10 @@ R getStringPropOrThrow<R extends String?>(
 /// Retrieves a number (num) property from a map.
 /// Note: In Dart, num is the superclass of int and double.
 R getNumberPropOrDefault<R extends num?>(
-    Map<String, dynamic>? props, String prop, R defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  R defaultValue,
+) {
   try {
     return getNumberPropOrThrow<R>(props, prop);
   } catch (_) {
@@ -69,7 +81,10 @@ R getNumberPropOrDefault<R extends num?>(
 }
 
 R getNumberPropOrDefaultFunction<R extends num?>(
-    Map<String, dynamic>? props, String prop, R Function() defaultFunction) {
+  Map<String, dynamic>? props,
+  String prop,
+  R Function() defaultFunction,
+) {
   try {
     return getNumberPropOrThrow<R>(props, prop);
   } catch (_) {
@@ -77,8 +92,11 @@ R getNumberPropOrDefaultFunction<R extends num?>(
   }
 }
 
-R getNumberPropOrThrow<R extends num?>(Map<String, dynamic>? props, String prop,
-    {String? message}) {
+R getNumberPropOrThrow<R extends num?>(
+  Map<String, dynamic>? props,
+  String prop, {
+  String? message,
+}) {
   if (props != null) {
     if (props.containsKey(prop)) {
       final v = props[prop];
@@ -87,7 +105,7 @@ R getNumberPropOrThrow<R extends num?>(Map<String, dynamic>? props, String prop,
         // Usually num covers both. If R is strictly int, and v is double, this might fail cast.
         // Let's try to be smart.
         try {
-            return v as R;
+          return v as R;
         } catch (_) {}
         if (R == int && v is double) return v.toInt() as R;
         if (R == double && v is int) return v.toDouble() as R;
@@ -97,23 +115,27 @@ R getNumberPropOrThrow<R extends num?>(Map<String, dynamic>? props, String prop,
       if (v is String) {
         final n = num.tryParse(v);
         if (n != null) {
-             try {
-                 return n as R;
-             } catch(_) {}
-             if (R == int && n is double) return n.toInt() as R;
-             if (R == double && n is int) return n.toDouble() as R;
+          try {
+            return n as R;
+          } catch (_) {}
+          if (R == int && n is double) return n.toInt() as R;
+          if (R == double && n is int) return n.toDouble() as R;
         }
       }
     }
   }
   throw ArgumentError(
-      message ?? '$prop not found as number in ${props.runtimeType}');
+    message ?? '$prop not found as number in ${props.runtimeType}',
+  );
 }
 
 // --- BigInt ---
 
 R getBigIntPropOrDefault<R extends BigInt?>(
-    Map<String, dynamic>? props, String prop, R defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  R defaultValue,
+) {
   try {
     return getBigIntPropOrThrow(props, prop);
   } catch (_) {}
@@ -121,7 +143,10 @@ R getBigIntPropOrDefault<R extends BigInt?>(
 }
 
 R getBigIntPropOrDefaultFunction<R extends BigInt?>(
-    Map<String, dynamic>? props, String prop, R Function() defaultFunction) {
+  Map<String, dynamic>? props,
+  String prop,
+  R Function() defaultFunction,
+) {
   try {
     return getBigIntPropOrThrow(props, prop);
   } catch (_) {}
@@ -129,8 +154,10 @@ R getBigIntPropOrDefaultFunction<R extends BigInt?>(
 }
 
 R getBigIntPropOrThrow<R extends BigInt?>(
-    Map<String, dynamic>? props, String prop,
-    {String? message}) {
+  Map<String, dynamic>? props,
+  String prop, {
+  String? message,
+}) {
   if (props != null) {
     if (props.containsKey(prop)) {
       final v = props[prop];
@@ -147,29 +174,39 @@ R getBigIntPropOrThrow<R extends BigInt?>(
     }
   }
   throw ArgumentError(
-      message ?? '$prop not found as BigInt in ${props.runtimeType}');
+    message ?? '$prop not found as BigInt in ${props.runtimeType}',
+  );
 }
 
 // --- Boolean ---
 
 bool getBooleanPropOrDefault(
-    Map<String, dynamic>? props, String prop, bool defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  bool defaultValue,
+) {
   try {
     return getBooleanPropOrThrow(props, prop);
   } catch (_) {}
   return defaultValue;
 }
 
-bool getBooleanPropOrDefaultFunction(Map<String, dynamic>? props, String prop,
-    bool Function() defaultFunction) {
+bool getBooleanPropOrDefaultFunction(
+  Map<String, dynamic>? props,
+  String prop,
+  bool Function() defaultFunction,
+) {
   try {
     return getBooleanPropOrThrow(props, prop);
   } catch (_) {}
   return defaultFunction();
 }
 
-bool getBooleanPropOrThrow(Map<String, dynamic>? props, String prop,
-    {bool Function(dynamic v)? constructorFunc}) {
+bool getBooleanPropOrThrow(
+  Map<String, dynamic>? props,
+  String prop, {
+  bool Function(dynamic v)? constructorFunc,
+}) {
   if (props != null && props.containsKey(prop)) {
     final v = props[prop];
     if (constructorFunc != null) {
@@ -182,10 +219,11 @@ bool getBooleanPropOrThrow(Map<String, dynamic>? props, String prop,
 }
 
 bool getBooleanFunctionPropOrDefault(
-    Map<String, dynamic>? props,
-    String prop,
-    bool Function(dynamic v) constructorFunc,
-    bool defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  bool Function(dynamic v) constructorFunc,
+  bool defaultValue,
+) {
   try {
     return getBooleanPropOrThrow(props, prop, constructorFunc: constructorFunc);
   } catch (_) {}
@@ -193,10 +231,11 @@ bool getBooleanFunctionPropOrDefault(
 }
 
 bool getBooleanFunctionPropOrDefaultFunction(
-    Map<String, dynamic>? props,
-    String prop,
-    bool Function(dynamic v) constructorFunc,
-    bool Function() defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  bool Function(dynamic v) constructorFunc,
+  bool Function() defaultValue,
+) {
   try {
     return getBooleanPropOrThrow(props, prop, constructorFunc: constructorFunc);
   } catch (_) {}
@@ -209,7 +248,10 @@ bool getBooleanFunctionPropOrDefaultFunction(
 // We can use generic R.
 
 R getDatePropOrDefault<R>(
-    Map<String, dynamic>? props, String prop, R defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  R defaultValue,
+) {
   try {
     final res = getDatePropOrThrow(props, prop);
     return res as R;
@@ -218,7 +260,10 @@ R getDatePropOrDefault<R>(
 }
 
 R getDatePropOrDefaultFunction<R>(
-    Map<String, dynamic>? props, String prop, R Function() defaultFunction) {
+  Map<String, dynamic>? props,
+  String prop,
+  R Function() defaultFunction,
+) {
   try {
     // If R is nullable Date, or just Date (and we cast it to R which might be Date)
     // The typescript signature is: R | Date.
@@ -255,7 +300,10 @@ DateTime getDatePropOrThrow(Map<String, dynamic>? props, String prop) {
 // --- String Array ---
 
 R getStringArrayPropOrDefault<R>(
-    Map<String, dynamic>? props, String prop, R defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  R defaultValue,
+) {
   try {
     final res = getStringArrayPropOrThrow(props, prop);
     return res as R;
@@ -264,7 +312,10 @@ R getStringArrayPropOrDefault<R>(
 }
 
 R getStringArrayPropOrDefaultFunction<R>(
-    Map<String, dynamic>? props, String prop, R Function() defaultFunction) {
+  Map<String, dynamic>? props,
+  String prop,
+  R Function() defaultFunction,
+) {
   try {
     final res = getStringArrayPropOrThrow(props, prop);
     return res as R;
@@ -273,8 +324,10 @@ R getStringArrayPropOrDefaultFunction<R>(
 }
 
 List<String> getStringArrayPropOrThrow(
-    Map<String, dynamic>? props, String prop,
-    {String? message}) {
+  Map<String, dynamic>? props,
+  String prop, {
+  String? message,
+}) {
   if (props != null) {
     if (props.containsKey(prop)) {
       final v = props[prop];
@@ -284,63 +337,72 @@ List<String> getStringArrayPropOrThrow(
     }
   }
   throw ArgumentError(
-      message ?? '$prop not found as string[] in ${props.runtimeType}');
+    message ?? '$prop not found as string[] in ${props.runtimeType}',
+  );
 }
 
 // --- Date Array ---
 
 R getDateArrayPropOrDefault<R>(
-    Map<String, dynamic>? props, String prop, R defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  R defaultValue,
+) {
   try {
     final res = getDateArrayPropOrThrow(props, prop);
     return res as R;
   } catch (e) {
-      if (e is ArgumentError && (e.message?.toString().contains("not found as date[]") ?? false)) {
-          // Pass, return default
-      } else if (e is ArgumentError) {
-           // TS code checks checks for "not found as date[]" explicitly to decide whether to rethrow or return default?
-           // Actually TS code: if (!((e as Error)?.toString() ?? "").includes("not found as date[]")) { throw e; }
-           // So if it IS "not found as date[]", it catches it and returns default.
-           // If it is something else (like "Unknown type for date"), it rethrows.
-           // In my code below, "Unknown type for date" is thrown as ArgumentError too.
-           if (!e.message.toString().contains("not found as date[]")) {
-               throw e;
-           }
-      } else {
-        throw e;
+    if (e is ArgumentError &&
+        (e.message?.toString().contains("not found as date[]") ?? false)) {
+      // Pass, return default
+    } else if (e is ArgumentError) {
+      // TS code checks checks for "not found as date[]" explicitly to decide whether to rethrow or return default?
+      // Actually TS code: if (!((e as Error)?.toString() ?? "").includes("not found as date[]")) { throw e; }
+      // So if it IS "not found as date[]", it catches it and returns default.
+      // If it is something else (like "Unknown type for date"), it rethrows.
+      // In my code below, "Unknown type for date" is thrown as ArgumentError too.
+      if (!e.message.toString().contains("not found as date[]")) {
+        rethrow;
       }
-
+    } else {
+      rethrow;
+    }
   }
   return defaultValue;
 }
 
 R getDateArrayPropOrDefaultFunction<R>(
-    Map<String, dynamic>? props, String prop, R Function() defaultFunction) {
+  Map<String, dynamic>? props,
+  String prop,
+  R Function() defaultFunction,
+) {
   try {
     final res = getDateArrayPropOrThrow(props, prop);
     return res as R;
   } catch (e) {
-      if (e is ArgumentError && (e.message?.toString().contains("not found as date[]") ?? false)) {
-          // Pass, return default
-      } else if (e is ArgumentError) {
-           // TS code checks checks for "not found as date[]" explicitly to decide whether to rethrow or return default?
-           // Actually TS code: if (!((e as Error)?.toString() ?? "").includes("not found as date[]")) { throw e; }
-           // So if it IS "not found as date[]", it catches it and returns default.
-           // If it is something else (like "Unknown type for date"), it rethrows.
-           // In my code below, "Unknown type for date" is thrown as ArgumentError too.
-           if (!e.message.toString().contains("not found as date[]")) {
-               throw e;
-           }
-      } else {
-        throw e;
+    if (e is ArgumentError &&
+        (e.message?.toString().contains("not found as date[]") ?? false)) {
+      // Pass, return default
+    } else if (e is ArgumentError) {
+      // TS code checks checks for "not found as date[]" explicitly to decide whether to rethrow or return default?
+      // Actually TS code: if (!((e as Error)?.toString() ?? "").includes("not found as date[]")) { throw e; }
+      // So if it IS "not found as date[]", it catches it and returns default.
+      // If it is something else (like "Unknown type for date"), it rethrows.
+      // In my code below, "Unknown type for date" is thrown as ArgumentError too.
+      if (!e.message.toString().contains("not found as date[]")) {
+        rethrow;
       }
-
+    } else {
+      rethrow;
+    }
   }
   return defaultFunction();
 }
 
 List<DateTime> getDateArrayPropOrThrow(
-    Map<String, dynamic>? props, String prop) {
+  Map<String, dynamic>? props,
+  String prop,
+) {
   if (props != null) {
     if (props.containsKey(prop)) {
       final v = props[prop];
@@ -351,7 +413,7 @@ List<DateTime> getDateArrayPropOrThrow(
           } else if (e is DateTime) {
             return e;
           } else if (e is num) {
-             return DateTime.fromMillisecondsSinceEpoch((e * 1000).toInt());
+            return DateTime.fromMillisecondsSinceEpoch((e * 1000).toInt());
           }
           throw ArgumentError('Unknown type for date $e ${e.runtimeType}');
         }).toList();
@@ -374,32 +436,37 @@ Y getObjectPropOrThrow<Y>(Map<String, dynamic>? props, String prop) {
 }
 
 Y getObjectFunctionPropOrThrow<Y>(
-    Map<String, dynamic>? props,
-    String prop,
-    ConstructorFunc<Y> constructorFunc,
-    {String? message}) {
+  Map<String, dynamic>? props,
+  String prop,
+  ConstructorFunc<Y> constructorFunc, {
+  String? message,
+}) {
   if (props != null) {
     if (props.containsKey(prop)) {
       final v = props[prop];
       if (v is Map<String, dynamic>) {
         return constructorFunc(v);
       }
-       // Handling if it's a Map but not <String, dynamic>?
-       // In Dart JSON decoding usually produces Map<String, dynamic>.
-       // If it is Map<dynamic, dynamic>, we might need to cast.
-       if (v is Map) {
-           try {
-               return constructorFunc(v.cast<String, dynamic>());
-           } catch (_) {}
-       }
+      // Handling if it's a Map but not <String, dynamic>?
+      // In Dart JSON decoding usually produces Map<String, dynamic>.
+      // If it is Map<dynamic, dynamic>, we might need to cast.
+      if (v is Map) {
+        try {
+          return constructorFunc(v.cast<String, dynamic>());
+        } catch (_) {}
+      }
     }
   }
   throw ArgumentError(
-      message ?? '$prop not found as object in ${props.runtimeType}');
+    message ?? '$prop not found as object in ${props.runtimeType}',
+  );
 }
 
 Y getObjectPropOrDefault<Y>(
-    Map<String, dynamic>? props, String prop, Y defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  Y defaultValue,
+) {
   try {
     return getObjectPropOrThrow<Y>(props, prop);
   } catch (_) {}
@@ -407,10 +474,11 @@ Y getObjectPropOrDefault<Y>(
 }
 
 Y getObjectFunctionPropOrDefault<Y>(
-    Map<String, dynamic>? props,
-    String prop,
-    ConstructorFunc<Y> constructorFunc,
-    Y defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  ConstructorFunc<Y> constructorFunc,
+  Y defaultValue,
+) {
   try {
     return getObjectFunctionPropOrThrow(props, prop, constructorFunc);
   } catch (_) {}
@@ -418,10 +486,11 @@ Y getObjectFunctionPropOrDefault<Y>(
 }
 
 Y getObjectPropOrDefaultFunction<Y>(
-    Map<String, dynamic>? props,
-    String prop,
-    ConstructorFunc<Y> constructorFunc,
-    Y Function() defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  ConstructorFunc<Y> constructorFunc,
+  Y Function() defaultValue,
+) {
   try {
     return getObjectFunctionPropOrThrow(props, prop, constructorFunc);
   } catch (_) {}
@@ -431,53 +500,60 @@ Y getObjectPropOrDefaultFunction<Y>(
 // --- Object Array ---
 
 X getObjectArrayPropOrThrow<Y, X extends List<Y>?>(
-    Map<String, dynamic>? props, String prop) {
-   // X is List<Y> or List<Y>?
-   // We need to pass a constructor func that just casts.
-   return getObjectArrayFunctionPropOrThrow<Y, X>(props, prop, (e) => e as Y);
+  Map<String, dynamic>? props,
+  String prop,
+) {
+  // X is List<Y> or List<Y>?
+  // We need to pass a constructor func that just casts.
+  return getObjectArrayFunctionPropOrThrow<Y, X>(props, prop, (e) => e as Y);
 }
 
 X getObjectArrayFunctionPropOrThrow<Y, X extends List<Y>?>(
-    Map<String, dynamic>? props,
-    String prop,
-    ConstructorFunc<Y> constructorFunc,
-    {String? message}) {
+  Map<String, dynamic>? props,
+  String prop,
+  ConstructorFunc<Y> constructorFunc, {
+  String? message,
+}) {
   if (props != null) {
     if (props.containsKey(prop)) {
       final v = props[prop];
       if (v is List) {
-         // v is List<dynamic>. We need to map it.
-         final list = v.map((e) {
-             if (e is Map<String, dynamic>) {
-                 return constructorFunc(e);
-             }
-             if (e is Map) {
-                 return constructorFunc(e.cast<String, dynamic>());
-             }
-             // What if e is not a map? The constructorFunc expects Map<String, dynamic>.
-             // But in `getObjectArrayPropOrThrow`, the constructorFunc is `(e) => e as Y`.
-             // If Y is something else, this might work if constructorFunc handles it.
-             // But ConstructorFunc definition is `Y Function(Map<String, dynamic> params)`.
-             // So e MUST be a Map.
-             // If it is not a Map, this will throw type error at runtime when calling constructorFunc,
-             // or we should handle it?
-             // TS: `return v.map(constructorFunc) as X;`
-             // TS `ConstructorFunc` is `(params: object) => Y`.
-             // JS `object` can be almost anything.
-             // Dart `Map<String, dynamic>` is more specific.
-             // If we strictly follow `ConstructorFunc` typedef, we must pass a Map.
-             throw ArgumentError("Element in array is not a Map");
-         }).toList();
-         return list as X;
+        // v is List<dynamic>. We need to map it.
+        final list = v.map((e) {
+          if (e is Map<String, dynamic>) {
+            return constructorFunc(e);
+          }
+          if (e is Map) {
+            return constructorFunc(e.cast<String, dynamic>());
+          }
+          // What if e is not a map? The constructorFunc expects Map<String, dynamic>.
+          // But in `getObjectArrayPropOrThrow`, the constructorFunc is `(e) => e as Y`.
+          // If Y is something else, this might work if constructorFunc handles it.
+          // But ConstructorFunc definition is `Y Function(Map<String, dynamic> params)`.
+          // So e MUST be a Map.
+          // If it is not a Map, this will throw type error at runtime when calling constructorFunc,
+          // or we should handle it?
+          // TS: `return v.map(constructorFunc) as X;`
+          // TS `ConstructorFunc` is `(params: object) => Y`.
+          // JS `object` can be almost anything.
+          // Dart `Map<String, dynamic>` is more specific.
+          // If we strictly follow `ConstructorFunc` typedef, we must pass a Map.
+          throw ArgumentError("Element in array is not a Map");
+        }).toList();
+        return list as X;
       }
     }
   }
   throw ArgumentError(
-      message ?? '$prop not found as object in ${props.runtimeType}');
+    message ?? '$prop not found as object in ${props.runtimeType}',
+  );
 }
 
 X getObjectArrayPropOrDefault<Y, X extends List<Y>?>(
-    Map<String, dynamic>? props, String prop, X defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  X defaultValue,
+) {
   try {
     return getObjectArrayPropOrThrow<Y, X>(props, prop);
   } catch (_) {}
@@ -485,33 +561,44 @@ X getObjectArrayPropOrDefault<Y, X extends List<Y>?>(
 }
 
 X getObjectArrayFunctionPropOrDefault<Y, X extends List<Y>?>(
-    Map<String, dynamic>? props,
-    String prop,
-    ConstructorFunc<Y> constructorFunc,
-    X defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  ConstructorFunc<Y> constructorFunc,
+  X defaultValue,
+) {
   try {
-    return getObjectArrayFunctionPropOrThrow<Y, X>(props, prop, constructorFunc);
+    return getObjectArrayFunctionPropOrThrow<Y, X>(
+      props,
+      prop,
+      constructorFunc,
+    );
   } catch (_) {}
   return defaultValue;
 }
 
 X getObjectArrayPropOrDefaultFunction<Y, X extends List<Y>?>(
-    Map<String, dynamic>? props,
-    String prop,
-    ConstructorFunc<Y> constructorFunc,
-    X Function() defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  ConstructorFunc<Y> constructorFunc,
+  X Function() defaultValue,
+) {
   try {
-    return getObjectArrayFunctionPropOrThrow<Y, X>(props, prop, constructorFunc);
+    return getObjectArrayFunctionPropOrThrow<Y, X>(
+      props,
+      prop,
+      constructorFunc,
+    );
   } catch (_) {}
   return defaultValue();
 }
 
-
 // --- Map ---
 
 Map<K, V> getMapPropOrThrow<K, V>(
-    Map<String, dynamic>? props, String prop,
-    {String? message}) {
+  Map<String, dynamic>? props,
+  String prop, {
+  String? message,
+}) {
   if (props != null) {
     if (props.containsKey(prop)) {
       final v = props[prop];
@@ -525,20 +612,27 @@ Map<K, V> getMapPropOrThrow<K, V>(
     }
   }
   throw ArgumentError(
-      message ?? '$prop not found as Map in ${props.runtimeType}');
+    message ?? '$prop not found as Map in ${props.runtimeType}',
+  );
 }
 
 R getMapPropOrDefault<K, V, R>(
-    Map<String, dynamic>? props, String prop, R defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  R defaultValue,
+) {
   try {
-     final res = getMapPropOrThrow<K, V>(props, prop);
-     return res as R;
+    final res = getMapPropOrThrow<K, V>(props, prop);
+    return res as R;
   } catch (_) {}
   return defaultValue;
 }
 
 R getMapPropOrDefaultFunction<K, V, R>(
-    Map<String, dynamic>? props, String prop, R Function() defaultFunction) {
+  Map<String, dynamic>? props,
+  String prop,
+  R Function() defaultFunction,
+) {
   try {
     final res = getMapPropOrThrow<K, V>(props, prop);
     return res as R;
@@ -546,35 +640,39 @@ R getMapPropOrDefaultFunction<K, V, R>(
   return defaultFunction();
 }
 
-
 // --- Allow Null variants ---
 
 Y getObjectPropOrThrowAllowNull<Y>(Map<String, dynamic>? props, String prop) {
-    return getObjectFunctionPropOrThrowAllowNull<Y>(props, prop, (e) => e as Y);
+  return getObjectFunctionPropOrThrowAllowNull<Y>(props, prop, (e) => e as Y);
 }
 
 Y getObjectFunctionPropOrThrowAllowNull<Y>(
-    Map<String, dynamic>? props,
-    String prop,
-    ConstructorFuncAllowNull<Y> constructorFunc,
-    {String? message}) {
+  Map<String, dynamic>? props,
+  String prop,
+  ConstructorFuncAllowNull<Y> constructorFunc, {
+  String? message,
+}) {
   if (props != null) {
     if (props.containsKey(prop)) {
       final v = props[prop];
       if (v is Map<String, dynamic> || v == null) {
-         return constructorFunc(v);
+        return constructorFunc(v);
       }
       if (v is Map) {
-           return constructorFunc(v.cast<String, dynamic>());
+        return constructorFunc(v.cast<String, dynamic>());
       }
     }
   }
   throw ArgumentError(
-      message ?? '$prop not found as object in ${props.runtimeType}');
+    message ?? '$prop not found as object in ${props.runtimeType}',
+  );
 }
 
 Y getObjectPropOrDefaultAllowNull<Y>(
-    Map<String, dynamic>? props, String prop, Y defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  Y defaultValue,
+) {
   try {
     return getObjectPropOrThrowAllowNull<Y>(props, prop);
   } catch (_) {}
@@ -582,10 +680,11 @@ Y getObjectPropOrDefaultAllowNull<Y>(
 }
 
 Y getObjectFunctionPropOrDefaultAllowNull<Y>(
-    Map<String, dynamic>? props,
-    String prop,
-    ConstructorFuncAllowNull<Y> constructorFunc,
-    Y defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  ConstructorFuncAllowNull<Y> constructorFunc,
+  Y defaultValue,
+) {
   try {
     return getObjectFunctionPropOrThrowAllowNull(props, prop, constructorFunc);
   } catch (_) {}
@@ -593,10 +692,11 @@ Y getObjectFunctionPropOrDefaultAllowNull<Y>(
 }
 
 Y getObjectPropOrDefaultFunctionAllowNull<Y>(
-    Map<String, dynamic>? props,
-    String prop,
-    ConstructorFuncAllowNull<Y> constructorFunc,
-    Y Function() defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  ConstructorFuncAllowNull<Y> constructorFunc,
+  Y Function() defaultValue,
+) {
   try {
     return getObjectFunctionPropOrThrowAllowNull(props, prop, constructorFunc);
   } catch (_) {}
