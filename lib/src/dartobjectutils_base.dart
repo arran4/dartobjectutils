@@ -808,3 +808,107 @@ List<bool> getBooleanArrayPropOrThrow(
   throw ArgumentError(
       message ?? '$prop not found as boolean[] in ${props.runtimeType}');
 }
+
+// --- Enum ---
+
+T getEnumPropOrThrow<T>(
+  Map<String, dynamic>? props,
+  String prop,
+  List<T> values, {
+  String? message,
+}) {
+  if (props != null) {
+    if (props.containsKey(prop)) {
+      final v = props[prop];
+      try {
+        return values.firstWhere(
+          (e) => e.toString().split('.').last == v,
+        );
+      } catch (_) {
+        // Fall through to throw
+      }
+    }
+  }
+  throw MissingOrInvalidPropertyException(
+    message ?? '$prop not found as enum in ${props.runtimeType}',
+  );
+}
+
+T? getEnumPropOrDefault<T>(
+  Map<String, dynamic>? props,
+  String prop,
+  List<T> values,
+  T? defaultValue,
+) {
+  try {
+    return getEnumPropOrThrow(props, prop, values);
+  } catch (_) {}
+  return defaultValue;
+}
+
+T? getEnumPropOrDefaultFunction<T>(
+  Map<String, dynamic>? props,
+  String prop,
+  List<T> values,
+  T? Function() defaultFunction,
+) {
+  try {
+    return getEnumPropOrThrow(props, prop, values);
+  } catch (_) {}
+  return defaultFunction();
+}
+
+// --- Enum Array ---
+
+List<T> getEnumArrayPropOrThrow<T>(
+  Map<String, dynamic>? props,
+  String prop,
+  List<T> values, {
+  String? message,
+}) {
+  if (props != null) {
+    if (props.containsKey(prop)) {
+      final v = props[prop];
+      if (v is List) {
+        return v.map((e) {
+          try {
+            return values.firstWhere(
+              (val) => val.toString().split('.').last == e,
+            );
+          } catch (_) {
+            throw ElementConversionException(
+              'Unknown type for enum $e ${e.runtimeType}',
+            );
+          }
+        }).toList();
+      }
+    }
+  }
+  throw MissingOrInvalidPropertyException(
+    message ?? '$prop not found as enum[] in ${props.runtimeType}',
+  );
+}
+
+List<T> getEnumArrayPropOrDefault<T>(
+  Map<String, dynamic>? props,
+  String prop,
+  List<T> values,
+  List<T> defaultValue,
+) {
+  try {
+    return getEnumArrayPropOrThrow(props, prop, values);
+  } catch (_) {}
+  return defaultValue;
+}
+
+List<T> getEnumArrayPropOrDefaultFunction<T>(
+  Map<String, dynamic>? props,
+  String prop,
+  List<T> values,
+  List<T> Function() defaultFunction,
+) {
+  try {
+    return getEnumArrayPropOrThrow(props, prop, values);
+  } catch (_) {}
+  return defaultFunction();
+}
