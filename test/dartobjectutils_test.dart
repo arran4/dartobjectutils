@@ -308,7 +308,31 @@ void main() {
         [TestEnum.three],
       );
     });
+
+    test('getEnumPropOrThrow with keyExtractor', () {
+      final customMap = {'enum': 'custom_one'};
+      expect(
+        getEnumPropOrThrow(
+          customMap,
+          'enum',
+          CustomTestEnum.values,
+          keyExtractor: (e) => e.name,
+        ),
+        CustomTestEnum.one,
+      );
+    });
   });
 }
 
 enum TestEnum { one, two, three }
+
+enum CustomTestEnum {
+  one,
+  two,
+  three;
+
+  @override
+  String toString() {
+    return 'custom_$name';
+  }
+}

@@ -103,6 +103,41 @@ final isAdmin = getBooleanPropOrDefault(rawUser, 'IsAdmin', false);
 * `getObjectFunctionPropOrDefaultAllowNull`, `getObjectFunctionPropOrThrowAllowNull`
 * `getMapPropOrDefault`, `getMapPropOrDefaultFunction`, `getMapPropOrThrow`
 
+### Enum
+* `getEnumPropOrDefault`, `getEnumPropOrDefaultFunction`, `getEnumPropOrThrow`
+
+By default, the enum helpers compare the string value from the map with the enum's name (e.g., `MyEnum.value` becomes `"value"`). If your enum has a custom `toString()` or you need to use a different property for comparison, you can provide an optional `keyExtractor` function.
+
+**Example with `keyExtractor`:**
+
+```dart
+enum CustomEnum {
+  one,
+  two;
+
+  @override
+  String toString() {
+    // Custom format that won't work with the default logic
+    return 'custom-prefix-$name';
+  }
+}
+
+final data = {'myEnum': 'one'};
+
+// This would fail without a keyExtractor
+// final value = getEnumPropOrThrow(data, 'myEnum', CustomEnum.values);
+
+// This works by telling the function how to get the key
+final value = getEnumPropOrThrow(
+  data,
+  'myEnum',
+  CustomEnum.values,
+  keyExtractor: (e) => e.name, // Extracts 'one' instead of 'custom-prefix-one'
+);
+
+print(value); // CustomEnum.one
+```
+
 ## Running tests
 
 ```bash

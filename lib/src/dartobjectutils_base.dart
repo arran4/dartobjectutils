@@ -816,14 +816,14 @@ T getEnumPropOrThrow<T>(
   String prop,
   List<T> values, {
   String? message,
+  String Function(T)? keyExtractor,
 }) {
   if (props != null) {
     if (props.containsKey(prop)) {
       final v = props[prop];
       try {
-        return values.firstWhere(
-          (e) => e.toString().split('.').last == v,
-        );
+        final extractor = keyExtractor ?? (e) => e.toString().split('.').last;
+        return values.firstWhere((e) => extractor(e) == v);
       } catch (_) {
         // Fall through to throw
       }
@@ -838,10 +838,11 @@ T? getEnumPropOrDefault<T>(
   Map<String, dynamic>? props,
   String prop,
   List<T> values,
-  T? defaultValue,
-) {
+  T? defaultValue, {
+  String Function(T)? keyExtractor,
+}) {
   try {
-    return getEnumPropOrThrow(props, prop, values);
+    return getEnumPropOrThrow(props, prop, values, keyExtractor: keyExtractor);
   } catch (_) {}
   return defaultValue;
 }
@@ -850,10 +851,11 @@ T? getEnumPropOrDefaultFunction<T>(
   Map<String, dynamic>? props,
   String prop,
   List<T> values,
-  T? Function() defaultFunction,
-) {
+  T? Function() defaultFunction, {
+  String Function(T)? keyExtractor,
+}) {
   try {
-    return getEnumPropOrThrow(props, prop, values);
+    return getEnumPropOrThrow(props, prop, values, keyExtractor: keyExtractor);
   } catch (_) {}
   return defaultFunction();
 }
@@ -865,16 +867,17 @@ List<T> getEnumArrayPropOrThrow<T>(
   String prop,
   List<T> values, {
   String? message,
+  String Function(T)? keyExtractor,
 }) {
   if (props != null) {
     if (props.containsKey(prop)) {
       final v = props[prop];
       if (v is List) {
+        final extractor =
+            keyExtractor ?? (val) => val.toString().split('.').last;
         return v.map((e) {
           try {
-            return values.firstWhere(
-              (val) => val.toString().split('.').last == e,
-            );
+            return values.firstWhere((val) => extractor(val) == e);
           } catch (_) {
             throw ElementConversionException(
               'Unknown type for enum $e ${e.runtimeType}',
@@ -893,10 +896,12 @@ List<T> getEnumArrayPropOrDefault<T>(
   Map<String, dynamic>? props,
   String prop,
   List<T> values,
-  List<T> defaultValue,
-) {
+  List<T> defaultValue, {
+  String Function(T)? keyExtractor,
+}) {
   try {
-    return getEnumArrayPropOrThrow(props, prop, values);
+    return getEnumArrayPropOrThrow(props, prop, values,
+        keyExtractor: keyExtractor);
   } catch (_) {}
   return defaultValue;
 }
@@ -905,10 +910,12 @@ List<T> getEnumArrayPropOrDefaultFunction<T>(
   Map<String, dynamic>? props,
   String prop,
   List<T> values,
-  List<T> Function() defaultFunction,
-) {
+  List<T> Function() defaultFunction, {
+  String Function(T)? keyExtractor,
+}) {
   try {
-    return getEnumArrayPropOrThrow(props, prop, values);
+    return getEnumArrayPropOrThrow(props, prop, values,
+        keyExtractor: keyExtractor);
   } catch (_) {}
   return defaultFunction();
 }
