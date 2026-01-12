@@ -811,7 +811,7 @@ List<bool> getBooleanArrayPropOrThrow(
 
 // --- Enum ---
 
-T getEnumPropOrThrow<T>(
+T getEnumPropOrThrow<T extends Object>(
   Map<String, dynamic>? props,
   String prop,
   List<T> values, {
@@ -834,7 +834,7 @@ T getEnumPropOrThrow<T>(
   );
 }
 
-T? getEnumPropOrDefault<T>(
+T? getEnumPropOrDefault<T extends Object>(
   Map<String, dynamic>? props,
   String prop,
   List<T> values,
@@ -847,7 +847,7 @@ T? getEnumPropOrDefault<T>(
   return defaultValue;
 }
 
-T? getEnumPropOrDefaultFunction<T>(
+T? getEnumPropOrDefaultFunction<T extends Object>(
   Map<String, dynamic>? props,
   String prop,
   List<T> values,
@@ -862,7 +862,7 @@ T? getEnumPropOrDefaultFunction<T>(
 
 // --- Enum Array ---
 
-List<T> getEnumArrayPropOrThrow<T>(
+List<T> getEnumArrayPropOrThrow<T extends Object>(
   Map<String, dynamic>? props,
   String prop,
   List<T> values, {
@@ -892,7 +892,7 @@ List<T> getEnumArrayPropOrThrow<T>(
   );
 }
 
-List<T> getEnumArrayPropOrDefault<T>(
+List<T> getEnumArrayPropOrDefault<T extends Object>(
   Map<String, dynamic>? props,
   String prop,
   List<T> values,
@@ -906,7 +906,7 @@ List<T> getEnumArrayPropOrDefault<T>(
   return defaultValue;
 }
 
-List<T> getEnumArrayPropOrDefaultFunction<T>(
+List<T> getEnumArrayPropOrDefaultFunction<T extends Object>(
   Map<String, dynamic>? props,
   String prop,
   List<T> values,
