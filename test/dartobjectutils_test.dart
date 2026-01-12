@@ -310,7 +310,7 @@ void main() {
     });
 
     test('getEnumPropOrThrow with keyExtractor', () {
-      final customMap = {'enum': 'custom_one'};
+      final customMap = {'enum': 'one'};
       expect(
         getEnumPropOrThrow(
           customMap,
