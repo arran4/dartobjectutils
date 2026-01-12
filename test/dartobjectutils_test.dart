@@ -216,4 +216,123 @@ void main() {
       expect(m, {'a': 1, 'b': 2});
     });
   });
+
+  group('Enum Tests', () {
+    final map = {
+      'enum': 'one',
+      'enums': ['one', 'two'],
+      'invalidEnum': 'four',
+    };
+
+    test('getEnumPropOrThrow', () {
+      expect(
+        getEnumPropOrThrow(map, 'enum', TestEnum.values),
+        TestEnum.one,
+      );
+      expect(
+        () => getEnumPropOrThrow(map, 'missing', TestEnum.values),
+        throwsA(isA<MissingOrInvalidPropertyException>()),
+      );
+      expect(
+        () => getEnumPropOrThrow(map, 'invalidEnum', TestEnum.values),
+        throwsA(isA<MissingOrInvalidPropertyException>()),
+      );
+    });
+
+    test('getEnumPropOrDefault', () {
+      expect(
+        getEnumPropOrDefault(map, 'enum', TestEnum.values, TestEnum.three),
+        TestEnum.one,
+      );
+      expect(
+        getEnumPropOrDefault(
+            map, 'missing', TestEnum.values, TestEnum.three),
+        TestEnum.three,
+      );
+    });
+
+    test('getEnumPropOrDefaultFunction', () {
+      expect(
+        getEnumPropOrDefaultFunction(
+            map, 'enum', TestEnum.values, () => TestEnum.three),
+        TestEnum.one,
+      );
+      expect(
+        getEnumPropOrDefaultFunction(
+            map, 'missing', TestEnum.values, () => TestEnum.three),
+        TestEnum.three,
+      );
+    });
+
+    test('getEnumArrayPropOrThrow', () {
+      expect(
+        getEnumArrayPropOrThrow(map, 'enums', TestEnum.values),
+        [TestEnum.one, TestEnum.two],
+      );
+      expect(
+        () => getEnumArrayPropOrThrow(map, 'missing', TestEnum.values),
+        throwsA(isA<MissingOrInvalidPropertyException>()),
+      );
+      expect(
+        () => getEnumArrayPropOrThrow(
+          {'enums': ['one', 'four']},
+          'enums',
+          TestEnum.values,
+        ),
+        throwsA(isA<ElementConversionException>()),
+      );
+    });
+
+    test('getEnumArrayPropOrDefault', () {
+      expect(
+        getEnumArrayPropOrDefault(
+            map, 'enums', TestEnum.values, [TestEnum.three]),
+        [TestEnum.one, TestEnum.two],
+      );
+      expect(
+        getEnumArrayPropOrDefault(
+            map, 'missing', TestEnum.values, [TestEnum.three]),
+        [TestEnum.three],
+      );
+    });
+
+    test('getEnumArrayPropOrDefaultFunction', () {
+      expect(
+        getEnumArrayPropOrDefaultFunction(
+            map, 'enums', TestEnum.values, () => [TestEnum.three]),
+        [TestEnum.one, TestEnum.two],
+      );
+      expect(
+        getEnumArrayPropOrDefaultFunction(
+            map, 'missing', TestEnum.values, () => [TestEnum.three]),
+        [TestEnum.three],
+      );
+    });
+
+    test('getEnumPropOrThrow with keyExtractor', () {
+      final customMap = {'enum': 'one'};
+      expect(
+        getEnumPropOrThrow(
+          customMap,
+          'enum',
+          CustomTestEnum.values,
+          keyExtractor: (e) => e.name,
+        ),
+        CustomTestEnum.one,
+      );
+    });
+  });
+}
+
+enum TestEnum { one, two, three }
+
+enum CustomTestEnum {
+  one,
+  two,
+  three;
+
+  @override
+  String toString() {
+    return 'custom_$name';
+  }
 }

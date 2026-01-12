@@ -808,3 +808,114 @@ List<bool> getBooleanArrayPropOrThrow(
   throw ArgumentError(
       message ?? '$prop not found as boolean[] in ${props.runtimeType}');
 }
+
+// --- Enum ---
+
+T getEnumPropOrThrow<T extends Object>(
+  Map<String, dynamic>? props,
+  String prop,
+  List<T> values, {
+  String? message,
+  String Function(T)? keyExtractor,
+}) {
+  if (props != null) {
+    if (props.containsKey(prop)) {
+      final v = props[prop];
+      try {
+        final extractor = keyExtractor ?? (e) => e.toString().split('.').last;
+        return values.firstWhere((e) => extractor(e) == v);
+      } catch (_) {
+        // Fall through to throw
+      }
+    }
+  }
+  throw MissingOrInvalidPropertyException(
+    message ?? '$prop not found as enum in ${props.runtimeType}',
+  );
+}
+
+T? getEnumPropOrDefault<T extends Object>(
+  Map<String, dynamic>? props,
+  String prop,
+  List<T> values,
+  T? defaultValue, {
+  String Function(T)? keyExtractor,
+}) {
+  try {
+    return getEnumPropOrThrow(props, prop, values, keyExtractor: keyExtractor);
+  } catch (_) {}
+  return defaultValue;
+}
+
+T? getEnumPropOrDefaultFunction<T extends Object>(
+  Map<String, dynamic>? props,
+  String prop,
+  List<T> values,
+  T? Function() defaultFunction, {
+  String Function(T)? keyExtractor,
+}) {
+  try {
+    return getEnumPropOrThrow(props, prop, values, keyExtractor: keyExtractor);
+  } catch (_) {}
+  return defaultFunction();
+}
+
+// --- Enum Array ---
+
+List<T> getEnumArrayPropOrThrow<T extends Object>(
+  Map<String, dynamic>? props,
+  String prop,
+  List<T> values, {
+  String? message,
+  String Function(T)? keyExtractor,
+}) {
+  if (props != null) {
+    if (props.containsKey(prop)) {
+      final v = props[prop];
+      if (v is List) {
+        final extractor =
+            keyExtractor ?? (val) => val.toString().split('.').last;
+        return v.map((e) {
+          try {
+            return values.firstWhere((val) => extractor(val) == e);
+          } catch (_) {
+            throw ElementConversionException(
+              'Unknown type for enum $e ${e.runtimeType}',
+            );
+          }
+        }).toList();
+      }
+    }
+  }
+  throw MissingOrInvalidPropertyException(
+    message ?? '$prop not found as enum[] in ${props.runtimeType}',
+  );
+}
+
+List<T> getEnumArrayPropOrDefault<T extends Object>(
+  Map<String, dynamic>? props,
+  String prop,
+  List<T> values,
+  List<T> defaultValue, {
+  String Function(T)? keyExtractor,
+}) {
+  try {
+    return getEnumArrayPropOrThrow(props, prop, values,
+        keyExtractor: keyExtractor);
+  } catch (_) {}
+  return defaultValue;
+}
+
+List<T> getEnumArrayPropOrDefaultFunction<T extends Object>(
+  Map<String, dynamic>? props,
+  String prop,
+  List<T> values,
+  List<T> Function() defaultFunction, {
+  String Function(T)? keyExtractor,
+}) {
+  try {
+    return getEnumArrayPropOrThrow(props, prop, values,
+        keyExtractor: keyExtractor);
+  } catch (_) {}
+  return defaultFunction();
+}
