@@ -73,6 +73,7 @@ final isAdmin = getBooleanPropOrDefault(rawUser, 'IsAdmin', false);
 
 ### String
 * `getStringPropOrDefault`, `getStringPropOrDefaultFunction`, `getStringPropOrThrow`
+* `getStringRegexpPropOrDefault`, `getStringRegexpPropOrDefaultFunction`, `getStringRegexpPropOrThrow`
 
 ### Number (int/double/num)
 * `getNumberPropOrDefault`, `getNumberPropOrDefaultFunction`, `getNumberPropOrThrow`
@@ -89,6 +90,7 @@ final isAdmin = getBooleanPropOrDefault(rawUser, 'IsAdmin', false);
 
 ### Arrays
 * `getStringArrayPropOrDefault`, `getStringArrayPropOrDefaultFunction`, `getStringArrayPropOrThrow`
+* `getStringArrayRegexpPropOrDefault`, `getStringArrayRegexpPropOrDefaultFunction`, `getStringArrayRegexpPropOrThrow`
 * `getDateArrayPropOrDefault`, `getDateArrayPropOrDefaultFunction`, `getDateArrayPropOrThrow`
 * `getNumberArrayPropOrDefault`, `getNumberArrayPropOrDefaultFunction`, `getNumberArrayPropOrThrow`
 * `getBigIntArrayPropOrDefault`, `getBigIntArrayPropOrDefaultFunction`, `getBigIntArrayPropOrThrow`
@@ -163,6 +165,10 @@ R getStringPropOrDefault<R extends String?>(Map<String, dynamic>? props, String 
 R getStringPropOrDefaultFunction<R extends String?>(Map<String, dynamic>? props, String prop, R Function() defaultFunction)
 R getStringPropOrThrow<R extends String?>(Map<String, dynamic>? props, String prop, {String? message})
 
+R getStringRegexpPropOrDefault<R extends String?>(Map<String, dynamic>? props, String prop, RegExp regexp, R defaultValue)
+R getStringRegexpPropOrDefaultFunction<R extends String?>(Map<String, dynamic>? props, String prop, RegExp regexp, R Function() defaultFunction)
+R getStringRegexpPropOrThrow<R extends String?>(Map<String, dynamic>? props, String prop, RegExp regexp, {String? message})
+
 R getNumberPropOrDefault<R extends num?>(Map<String, dynamic>? props, String prop, R defaultValue)
 R getNumberPropOrDefaultFunction<R extends num?>(Map<String, dynamic>? props, String prop, R Function() defaultFunction)
 R getNumberPropOrThrow<R extends num?>(Map<String, dynamic>? props, String prop, {String? message})
@@ -184,6 +190,10 @@ DateTime getDatePropOrThrow(Map<String, dynamic>? props, String prop)
 R getStringArrayPropOrDefault<R>(Map<String, dynamic>? props, String prop, R defaultValue)
 R getStringArrayPropOrDefaultFunction<R>(Map<String, dynamic>? props, String prop, R Function() defaultFunction)
 List<String> getStringArrayPropOrThrow(Map<String, dynamic>? props, String prop, {String? message})
+
+R getStringArrayRegexpPropOrDefault<R>(Map<String, dynamic>? props, String prop, RegExp regexp, R defaultValue)
+R getStringArrayRegexpPropOrDefaultFunction<R>(Map<String, dynamic>? props, String prop, RegExp regexp, R Function() defaultFunction)
+List<String> getStringArrayRegexpPropOrThrow(Map<String, dynamic>? props, String prop, RegExp regexp, {String? message})
 
 R getDateArrayPropOrDefault<R>(Map<String, dynamic>? props, String prop, R defaultValue)
 R getDateArrayPropOrDefaultFunction<R>(Map<String, dynamic>? props, String prop, R Function() defaultFunction)

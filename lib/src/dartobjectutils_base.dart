@@ -58,6 +58,53 @@ R getStringPropOrThrow<R extends String?>(
   );
 }
 
+// --- String Regexp ---
+
+/// Retrieves a string property from a map, checks if it matches the [regexp], or returns a default value if not found or mismatch.
+R getStringRegexpPropOrDefault<R extends String?>(
+  Map<String, dynamic>? props,
+  String prop,
+  RegExp regexp,
+  R defaultValue,
+) {
+  try {
+    return getStringRegexpPropOrThrow<R>(props, prop, regexp);
+  } catch (_) {
+    return defaultValue;
+  }
+}
+
+/// Retrieves a string property from a map, checks if it matches the [regexp], or returns the result of a default function if not found or mismatch.
+R getStringRegexpPropOrDefaultFunction<R extends String?>(
+  Map<String, dynamic>? props,
+  String prop,
+  RegExp regexp,
+  R Function() defaultFunction,
+) {
+  try {
+    return getStringRegexpPropOrThrow<R>(props, prop, regexp);
+  } catch (_) {
+    return defaultFunction();
+  }
+}
+
+/// Retrieves a string property from a map, checks if it matches the [regexp], or throws an error if not found or mismatch.
+R getStringRegexpPropOrThrow<R extends String?>(
+  Map<String, dynamic>? props,
+  String prop,
+  RegExp regexp, {
+  String? message,
+}) {
+  final val = getStringPropOrThrow<R>(props, prop, message: message);
+  if (val != null && !regexp.hasMatch(val)) {
+    throw MissingOrInvalidPropertyException(
+      message ??
+          '$prop value "$val" does not match pattern ${regexp.pattern} in ${props.runtimeType}',
+    );
+  }
+  return val;
+}
+
 // --- Number (int/double) ---
 
 /// Retrieves a number (num) property from a map.
@@ -337,6 +384,52 @@ List<String> getStringArrayPropOrThrow(
   throw MissingOrInvalidPropertyException(
     message ?? '$prop not found as string[] in ${props.runtimeType}',
   );
+}
+
+// --- String Array Regexp ---
+
+R getStringArrayRegexpPropOrDefault<R>(
+  Map<String, dynamic>? props,
+  String prop,
+  RegExp regexp,
+  R defaultValue,
+) {
+  try {
+    final res = getStringArrayRegexpPropOrThrow(props, prop, regexp);
+    return res as R;
+  } catch (_) {}
+  return defaultValue;
+}
+
+R getStringArrayRegexpPropOrDefaultFunction<R>(
+  Map<String, dynamic>? props,
+  String prop,
+  RegExp regexp,
+  R Function() defaultFunction,
+) {
+  try {
+    final res = getStringArrayRegexpPropOrThrow(props, prop, regexp);
+    return res as R;
+  } catch (_) {}
+  return defaultFunction();
+}
+
+List<String> getStringArrayRegexpPropOrThrow(
+  Map<String, dynamic>? props,
+  String prop,
+  RegExp regexp, {
+  String? message,
+}) {
+  final list = getStringArrayPropOrThrow(props, prop, message: message);
+  for (final val in list) {
+    if (!regexp.hasMatch(val)) {
+      throw MissingOrInvalidPropertyException(
+        message ??
+            '$prop element "$val" does not match pattern ${regexp.pattern} in ${props.runtimeType}',
+      );
+    }
+  }
+  return list;
 }
 
 // --- Date Array ---
