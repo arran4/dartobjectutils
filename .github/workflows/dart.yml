@@ -37,13 +37,44 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Verify Pubspec Version
+      - name: Update Pubspec Version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/v}
           PUBSPEC_VERSION=$(awk '/^version:/ {print $2}' pubspec.yaml)
           if [ "$TAG_VERSION" != "$PUBSPEC_VERSION" ]; then
-            echo "Error: Tag version ($TAG_VERSION) does not match pubspec.yaml version ($PUBSPEC_VERSION)"
-            exit 1
+            echo "Version mismatch: Tag=$TAG_VERSION, Pubspec=$PUBSPEC_VERSION"
+            echo "Updating pubspec.yaml on main..."
+
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+            git fetch origin main
+            git checkout main
+            git pull origin main
+
+            sed -i "s/^version: .*/version: $TAG_VERSION/" pubspec.yaml
+
+            if git diff --quiet pubspec.yaml; then
+              echo "pubspec.yaml matches tag version in main already."
+            else
+              git add pubspec.yaml
+              git commit -m "Bump version to $TAG_VERSION"
+
+              if git push origin main; then
+                echo "Successfully pushed version update to main."
+              else
+                echo "Push to main failed. Creating PR."
+                BRANCH_NAME="bump-version-$TAG_VERSION"
+                git checkout -b "$BRANCH_NAME"
+                git push origin "$BRANCH_NAME"
+                gh pr create --title "Bump version to $TAG_VERSION" --body "Automated version bump matches tag $TAG_VERSION" --base main
+              fi
+            fi
+
+            echo "Restoring tag checkout..."
+            git checkout $GITHUB_SHA
           fi
       - name: Create Release
         uses: softprops/action-gh-release@v1
