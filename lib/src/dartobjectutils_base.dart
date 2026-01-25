@@ -611,18 +611,6 @@ X getObjectArrayFunctionPropOrThrow<Y, X extends List<Y>?>(
           if (e is Map) {
             return constructorFunc(e.cast<String, dynamic>());
           }
-          // What if e is not a map? The constructorFunc expects Map<String, dynamic>.
-          // But in `getObjectArrayPropOrThrow`, the constructorFunc is `(e) => e as Y`.
-          // If Y is something else, this might work if constructorFunc handles it.
-          // But ConstructorFunc definition is `Y Function(Map<String, dynamic> params)`.
-          // So e MUST be a Map.
-          // If it is not a Map, this will throw type error at runtime when calling constructorFunc,
-          // or we should handle it?
-          // TS: `return v.map(constructorFunc) as X;`
-          // TS `ConstructorFunc` is `(params: object) => Y`.
-          // JS `object` can be almost anything.
-          // Dart `Map<String, dynamic>` is more specific.
-          // If we strictly follow `ConstructorFunc` typedef, we must pass a Map.
           throw ElementConversionException("Element in array is not a Map");
         }).toList();
         return list as X;
