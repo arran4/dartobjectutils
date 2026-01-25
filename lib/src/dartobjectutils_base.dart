@@ -16,11 +16,16 @@ R getStringPropOrDefault<R extends String?>(
   String prop,
   R defaultValue,
 ) {
-  try {
-    return getStringPropOrThrow<R>(props, prop);
-  } catch (_) {
-    return defaultValue;
+  if (props != null) {
+    final v = props[prop];
+    if (v is String) {
+      return v as R;
+    }
+    if (v is num) {
+      return v.toString() as R;
+    }
   }
+  return defaultValue;
 }
 
 /// Retrieves a string property from a map, or returns the result of a default function if not found or type mismatch.
@@ -29,11 +34,16 @@ R getStringPropOrDefaultFunction<R extends String?>(
   String prop,
   R Function() defaultFunction,
 ) {
-  try {
-    return getStringPropOrThrow<R>(props, prop);
-  } catch (_) {
-    return defaultFunction();
+  if (props != null) {
+    final v = props[prop];
+    if (v is String) {
+      return v as R;
+    }
+    if (v is num) {
+      return v.toString() as R;
+    }
   }
+  return defaultFunction();
 }
 
 /// Retrieves a string property from a map, or throws an error if not found or type mismatch.
@@ -594,29 +604,27 @@ X getObjectArrayFunctionPropOrThrow<Y, X extends List<Y>?>(
       final v = props[prop];
       if (v is List) {
         // v is List<dynamic>. We need to map it.
-        final list = v
-            .map((e) {
-              if (e is Map<String, dynamic>) {
-                return constructorFunc(e);
-              }
-              if (e is Map) {
-                return constructorFunc(e.cast<String, dynamic>());
-              }
-              // What if e is not a map? The constructorFunc expects Map<String, dynamic>.
-              // But in `getObjectArrayPropOrThrow`, the constructorFunc is `(e) => e as Y`.
-              // If Y is something else, this might work if constructorFunc handles it.
-              // But ConstructorFunc definition is `Y Function(Map<String, dynamic> params)`.
-              // So e MUST be a Map.
-              // If it is not a Map, this will throw type error at runtime when calling constructorFunc,
-              // or we should handle it?
-              // TS: `return v.map(constructorFunc) as X;`
-              // TS `ConstructorFunc` is `(params: object) => Y`.
-              // JS `object` can be almost anything.
-              // Dart `Map<String, dynamic>` is more specific.
-              // If we strictly follow `ConstructorFunc` typedef, we must pass a Map.
-              throw ElementConversionException("Element in array is not a Map");
-            })
-            .toList();
+        final list = v.map((e) {
+          if (e is Map<String, dynamic>) {
+            return constructorFunc(e);
+          }
+          if (e is Map) {
+            return constructorFunc(e.cast<String, dynamic>());
+          }
+          // What if e is not a map? The constructorFunc expects Map<String, dynamic>.
+          // But in `getObjectArrayPropOrThrow`, the constructorFunc is `(e) => e as Y`.
+          // If Y is something else, this might work if constructorFunc handles it.
+          // But ConstructorFunc definition is `Y Function(Map<String, dynamic> params)`.
+          // So e MUST be a Map.
+          // If it is not a Map, this will throw type error at runtime when calling constructorFunc,
+          // or we should handle it?
+          // TS: `return v.map(constructorFunc) as X;`
+          // TS `ConstructorFunc` is `(params: object) => Y`.
+          // JS `object` can be almost anything.
+          // Dart `Map<String, dynamic>` is more specific.
+          // If we strictly follow `ConstructorFunc` typedef, we must pass a Map.
+          throw ElementConversionException("Element in array is not a Map");
+        }).toList();
         return list as X;
       }
     }
@@ -782,7 +790,10 @@ Y getObjectPropOrDefaultFunctionAllowNull<Y>(
 // --- Number Array ---
 
 R getNumberArrayPropOrDefault<R>(
-    Map<String, dynamic>? props, String prop, R defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  R defaultValue,
+) {
   try {
     final res = getNumberArrayPropOrThrow(props, prop);
     return res as R;
@@ -791,7 +802,10 @@ R getNumberArrayPropOrDefault<R>(
 }
 
 R getNumberArrayPropOrDefaultFunction<R>(
-    Map<String, dynamic>? props, String prop, R Function() defaultFunction) {
+  Map<String, dynamic>? props,
+  String prop,
+  R Function() defaultFunction,
+) {
   try {
     final res = getNumberArrayPropOrThrow(props, prop);
     return res as R;
@@ -800,8 +814,10 @@ R getNumberArrayPropOrDefaultFunction<R>(
 }
 
 List<num> getNumberArrayPropOrThrow(
-    Map<String, dynamic>? props, String prop,
-    {String? message}) {
+  Map<String, dynamic>? props,
+  String prop, {
+  String? message,
+}) {
   if (props != null) {
     if (props.containsKey(prop)) {
       final v = props[prop];
@@ -809,8 +825,8 @@ List<num> getNumberArrayPropOrThrow(
         return v.map((e) {
           if (e is num) return e;
           if (e is String) {
-             final n = num.tryParse(e);
-             if (n != null) return n;
+            final n = num.tryParse(e);
+            if (n != null) return n;
           }
           throw ArgumentError('Element $e is not a number');
         }).toList();
@@ -818,13 +834,17 @@ List<num> getNumberArrayPropOrThrow(
     }
   }
   throw ArgumentError(
-      message ?? '$prop not found as number[] in ${props.runtimeType}');
+    message ?? '$prop not found as number[] in ${props.runtimeType}',
+  );
 }
 
 // --- BigInt Array ---
 
 R getBigIntArrayPropOrDefault<R>(
-    Map<String, dynamic>? props, String prop, R defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  R defaultValue,
+) {
   try {
     final res = getBigIntArrayPropOrThrow(props, prop);
     return res as R;
@@ -833,7 +853,10 @@ R getBigIntArrayPropOrDefault<R>(
 }
 
 R getBigIntArrayPropOrDefaultFunction<R>(
-    Map<String, dynamic>? props, String prop, R Function() defaultFunction) {
+  Map<String, dynamic>? props,
+  String prop,
+  R Function() defaultFunction,
+) {
   try {
     final res = getBigIntArrayPropOrThrow(props, prop);
     return res as R;
@@ -842,8 +865,10 @@ R getBigIntArrayPropOrDefaultFunction<R>(
 }
 
 List<BigInt> getBigIntArrayPropOrThrow(
-    Map<String, dynamic>? props, String prop,
-    {String? message}) {
+  Map<String, dynamic>? props,
+  String prop, {
+  String? message,
+}) {
   if (props != null) {
     if (props.containsKey(prop)) {
       final v = props[prop];
@@ -861,13 +886,17 @@ List<BigInt> getBigIntArrayPropOrThrow(
     }
   }
   throw ArgumentError(
-      message ?? '$prop not found as BigInt[] in ${props.runtimeType}');
+    message ?? '$prop not found as BigInt[] in ${props.runtimeType}',
+  );
 }
 
 // --- Boolean Array ---
 
 R getBooleanArrayPropOrDefault<R>(
-    Map<String, dynamic>? props, String prop, R defaultValue) {
+  Map<String, dynamic>? props,
+  String prop,
+  R defaultValue,
+) {
   try {
     final res = getBooleanArrayPropOrThrow(props, prop);
     return res as R;
@@ -876,7 +905,10 @@ R getBooleanArrayPropOrDefault<R>(
 }
 
 R getBooleanArrayPropOrDefaultFunction<R>(
-    Map<String, dynamic>? props, String prop, R Function() defaultFunction) {
+  Map<String, dynamic>? props,
+  String prop,
+  R Function() defaultFunction,
+) {
   try {
     final res = getBooleanArrayPropOrThrow(props, prop);
     return res as R;
@@ -885,8 +917,10 @@ R getBooleanArrayPropOrDefaultFunction<R>(
 }
 
 List<bool> getBooleanArrayPropOrThrow(
-    Map<String, dynamic>? props, String prop,
-    {String? message}) {
+  Map<String, dynamic>? props,
+  String prop, {
+  String? message,
+}) {
   if (props != null) {
     if (props.containsKey(prop)) {
       final v = props[prop];
@@ -899,7 +933,8 @@ List<bool> getBooleanArrayPropOrThrow(
     }
   }
   throw ArgumentError(
-      message ?? '$prop not found as boolean[] in ${props.runtimeType}');
+    message ?? '$prop not found as boolean[] in ${props.runtimeType}',
+  );
 }
 
 // --- Enum ---
@@ -993,8 +1028,12 @@ List<T> getEnumArrayPropOrDefault<T extends Object>(
   String Function(T)? keyExtractor,
 }) {
   try {
-    return getEnumArrayPropOrThrow(props, prop, values,
-        keyExtractor: keyExtractor);
+    return getEnumArrayPropOrThrow(
+      props,
+      prop,
+      values,
+      keyExtractor: keyExtractor,
+    );
   } catch (_) {}
   return defaultValue;
 }
@@ -1007,8 +1046,12 @@ List<T> getEnumArrayPropOrDefaultFunction<T extends Object>(
   String Function(T)? keyExtractor,
 }) {
   try {
-    return getEnumArrayPropOrThrow(props, prop, values,
-        keyExtractor: keyExtractor);
+    return getEnumArrayPropOrThrow(
+      props,
+      prop,
+      values,
+      keyExtractor: keyExtractor,
+    );
   } catch (_) {}
   return defaultFunction();
 }

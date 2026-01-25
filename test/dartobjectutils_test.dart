@@ -148,17 +148,23 @@ void main() {
     });
 
     test('getNumberArrayPropOrThrow', () {
-      final nums = getNumberArrayPropOrThrow({'nums': [1, 2.5, '3']}, 'nums');
+      final nums = getNumberArrayPropOrThrow({
+        'nums': [1, 2.5, '3'],
+      }, 'nums');
       expect(nums, [1, 2.5, 3]);
     });
 
     test('getBigIntArrayPropOrThrow', () {
-      final bigInts = getBigIntArrayPropOrThrow({'bigInts': [BigInt.one, 2, '3']}, 'bigInts');
+      final bigInts = getBigIntArrayPropOrThrow({
+        'bigInts': [BigInt.one, 2, '3'],
+      }, 'bigInts');
       expect(bigInts, [BigInt.one, BigInt.from(2), BigInt.from(3)]);
     });
 
     test('getBooleanArrayPropOrThrow', () {
-      final bools = getBooleanArrayPropOrThrow({'bools': [true, false]}, 'bools');
+      final bools = getBooleanArrayPropOrThrow({
+        'bools': [true, false],
+      }, 'bools');
       expect(bools, [true, false]);
     });
   });
@@ -225,10 +231,7 @@ void main() {
     };
 
     test('getEnumPropOrThrow', () {
-      expect(
-        getEnumPropOrThrow(map, 'enum', TestEnum.values),
-        TestEnum.one,
-      );
+      expect(getEnumPropOrThrow(map, 'enum', TestEnum.values), TestEnum.one);
       expect(
         () => getEnumPropOrThrow(map, 'missing', TestEnum.values),
         throwsA(isA<MissingOrInvalidPropertyException>()),
@@ -245,8 +248,7 @@ void main() {
         TestEnum.one,
       );
       expect(
-        getEnumPropOrDefault(
-            map, 'missing', TestEnum.values, TestEnum.three),
+        getEnumPropOrDefault(map, 'missing', TestEnum.values, TestEnum.three),
         TestEnum.three,
       );
     });
@@ -254,28 +256,38 @@ void main() {
     test('getEnumPropOrDefaultFunction', () {
       expect(
         getEnumPropOrDefaultFunction(
-            map, 'enum', TestEnum.values, () => TestEnum.three),
+          map,
+          'enum',
+          TestEnum.values,
+          () => TestEnum.three,
+        ),
         TestEnum.one,
       );
       expect(
         getEnumPropOrDefaultFunction(
-            map, 'missing', TestEnum.values, () => TestEnum.three),
+          map,
+          'missing',
+          TestEnum.values,
+          () => TestEnum.three,
+        ),
         TestEnum.three,
       );
     });
 
     test('getEnumArrayPropOrThrow', () {
-      expect(
-        getEnumArrayPropOrThrow(map, 'enums', TestEnum.values),
-        [TestEnum.one, TestEnum.two],
-      );
+      expect(getEnumArrayPropOrThrow(map, 'enums', TestEnum.values), [
+        TestEnum.one,
+        TestEnum.two,
+      ]);
       expect(
         () => getEnumArrayPropOrThrow(map, 'missing', TestEnum.values),
         throwsA(isA<MissingOrInvalidPropertyException>()),
       );
       expect(
         () => getEnumArrayPropOrThrow(
-          {'enums': ['one', 'four']},
+          {
+            'enums': ['one', 'four'],
+          },
           'enums',
           TestEnum.values,
         ),
@@ -285,13 +297,15 @@ void main() {
 
     test('getEnumArrayPropOrDefault', () {
       expect(
-        getEnumArrayPropOrDefault(
-            map, 'enums', TestEnum.values, [TestEnum.three]),
+        getEnumArrayPropOrDefault(map, 'enums', TestEnum.values, [
+          TestEnum.three,
+        ]),
         [TestEnum.one, TestEnum.two],
       );
       expect(
-        getEnumArrayPropOrDefault(
-            map, 'missing', TestEnum.values, [TestEnum.three]),
+        getEnumArrayPropOrDefault(map, 'missing', TestEnum.values, [
+          TestEnum.three,
+        ]),
         [TestEnum.three],
       );
     });
@@ -299,12 +313,20 @@ void main() {
     test('getEnumArrayPropOrDefaultFunction', () {
       expect(
         getEnumArrayPropOrDefaultFunction(
-            map, 'enums', TestEnum.values, () => [TestEnum.three]),
+          map,
+          'enums',
+          TestEnum.values,
+          () => [TestEnum.three],
+        ),
         [TestEnum.one, TestEnum.two],
       );
       expect(
         getEnumArrayPropOrDefaultFunction(
-            map, 'missing', TestEnum.values, () => [TestEnum.three]),
+          map,
+          'missing',
+          TestEnum.values,
+          () => [TestEnum.three],
+        ),
         [TestEnum.three],
       );
     });

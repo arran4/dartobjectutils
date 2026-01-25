@@ -8,10 +8,10 @@ class Address {
   final String zip;
 
   Address(Map<String, dynamic> json)
-      : street = getStringPropOrThrow(json, 'street'),
-        city = getStringPropOrThrow(json, 'city'),
-        // Use default value for optional fields
-        zip = getStringPropOrDefault(json, 'zip', '00000');
+    : street = getStringPropOrThrow(json, 'street'),
+      city = getStringPropOrThrow(json, 'city'),
+      // Use default value for optional fields
+      zip = getStringPropOrDefault(json, 'zip', '00000');
 
   @override
   String toString() => '$street, $city $zip';
@@ -27,28 +27,31 @@ class User {
   final Map<String, int> scores;
 
   User(Map<String, dynamic> json)
-      : name = getStringPropOrThrow(json, 'name'),
-        // Automatically converts compatible types (e.g. String "30" -> int 30)
-        age = getNumberPropOrDefault(json, 'age', 0).toInt(),
-        isActive = getBooleanPropOrDefault(json, 'isActive', false),
-        // Parse nested object
-        address = getObjectFunctionPropOrThrow(
-          json,
-          'address',
-          (j) => Address(j),
-        ),
-        // Parse array of primitives
-        tags = getStringArrayPropOrDefault(json, 'tags', <String>[]),
-        // Parse array of objects
-        prevAddresses = getObjectArrayFunctionPropOrDefault(
-          json,
-          'prevAddresses',
-          (j) => Address(j),
-          <Address>[],
-        )!, // ! is safe because we provide a non-null default value
-        // Explicitly specify generics for type safety when extracting Maps
-        scores = getMapPropOrDefault<String, int, Map<String, int>>(
-            json, 'scores', <String, int>{});
+    : name = getStringPropOrThrow(json, 'name'),
+      // Automatically converts compatible types (e.g. String "30" -> int 30)
+      age = getNumberPropOrDefault(json, 'age', 0).toInt(),
+      isActive = getBooleanPropOrDefault(json, 'isActive', false),
+      // Parse nested object
+      address = getObjectFunctionPropOrThrow(
+        json,
+        'address',
+        (j) => Address(j),
+      ),
+      // Parse array of primitives
+      tags = getStringArrayPropOrDefault(json, 'tags', <String>[]),
+      // Parse array of objects
+      prevAddresses = getObjectArrayFunctionPropOrDefault(
+        json,
+        'prevAddresses',
+        (j) => Address(j),
+        <Address>[],
+      )!, // ! is safe because we provide a non-null default value
+      // Explicitly specify generics for type safety when extracting Maps
+      scores = getMapPropOrDefault<String, int, Map<String, int>>(
+        json,
+        'scores',
+        <String, int>{},
+      );
 
   @override
   String toString() {
@@ -66,17 +69,13 @@ void main() {
     'name': 'Alice',
     'age': 30,
     'isActive': true,
-    'address': {
-      'street': '123 Main St',
-      'city': 'Wonderland',
-      'zip': '12345',
-    },
+    'address': {'street': '123 Main St', 'city': 'Wonderland', 'zip': '12345'},
     'tags': ['admin', 'editor'],
     'prevAddresses': [
       {'street': '456 Old St', 'city': 'OldTown', 'zip': '67890'},
-      {'street': '789 Unknown St', 'city': 'Nowhere'}
+      {'street': '789 Unknown St', 'city': 'Nowhere'},
     ],
-    'scores': {'math': 95, 'science': 88}
+    'scores': {'math': 95, 'science': 88},
   };
 
   print('\n1. Parsing Valid User:');
@@ -90,10 +89,7 @@ void main() {
   // Case 2: Missing optional fields (using defaults)
   final minimalJson = {
     'name': 'Bob',
-    'address': {
-      'street': '1st Ave',
-      'city': 'Metropolis',
-    },
+    'address': {'street': '1st Ave', 'city': 'Metropolis'},
     // 'age' missing -> defaults to 0
     // 'isActive' missing -> defaults to false
     // 'tags' missing -> defaults to []
@@ -111,7 +107,8 @@ void main() {
   // Case 3: Invalid data (throwing error)
   final invalidJson = {
     'name': 'Charlie',
-    'age': 'not a number', // getNumberPropOrDefault handles conversion failure -> defaults to 0
+    'age':
+        'not a number', // getNumberPropOrDefault handles conversion failure -> defaults to 0
     'address': 'Not a map', // getObjectFunctionPropOrThrow throws exception
   };
 
@@ -145,11 +142,17 @@ void main() {
 
     // Demonstration of manual extraction before creating the object
     print('Decoded name: ${getStringPropOrThrow(decoded, "name")}');
-    print('Decoded age: ${getNumberPropOrThrow(decoded, "age")}'); // Auto converts string "45" to num
+    print(
+      'Decoded age: ${getNumberPropOrThrow(decoded, "age")}',
+    ); // Auto converts string "45" to num
 
     // Custom handling for boolean if API returns 0/1 instead of true/false
     final isActive = getBooleanFunctionPropOrDefault(
-        decoded, 'isActive', (v) => v == 1 || v == true, false);
+      decoded,
+      'isActive',
+      (v) => v == 1 || v == true,
+      false,
+    );
     print('Decoded isActive (custom logic): $isActive');
 
     // Create User object
