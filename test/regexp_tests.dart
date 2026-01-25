@@ -7,7 +7,7 @@ void main() {
       'email': 'test@example.com',
       'username': 'user123',
       'invalid': '!!!',
-      'num': 123
+      'num': 123,
     };
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     final alphaNumericRegex = RegExp(r'^[a-zA-Z0-9]+$');
@@ -37,26 +37,35 @@ void main() {
       // Wrong type (though getStringPropOrThrow converts num to string,
       // let's see if regex matches the stringified version.
       // 123 matches ^[a-zA-Z0-9]+$
-      expect(
-        getStringRegexpPropOrThrow(map, 'num', alphaNumericRegex),
-        '123',
-      );
+      expect(getStringRegexpPropOrThrow(map, 'num', alphaNumericRegex), '123');
     });
 
     test('getStringRegexpPropOrDefault', () {
       expect(
         getStringRegexpPropOrDefault(
-            map, 'email', emailRegex, 'default@example.com'),
+          map,
+          'email',
+          emailRegex,
+          'default@example.com',
+        ),
         'test@example.com',
       );
       expect(
         getStringRegexpPropOrDefault(
-            map, 'invalid', alphaNumericRegex, 'default'),
+          map,
+          'invalid',
+          alphaNumericRegex,
+          'default',
+        ),
         'default',
       );
       expect(
         getStringRegexpPropOrDefault(
-            map, 'missing', alphaNumericRegex, 'default'),
+          map,
+          'missing',
+          alphaNumericRegex,
+          'default',
+        ),
         'default',
       );
     });
@@ -64,12 +73,20 @@ void main() {
     test('getStringRegexpPropOrDefaultFunction', () {
       expect(
         getStringRegexpPropOrDefaultFunction(
-            map, 'email', emailRegex, () => 'default@example.com'),
+          map,
+          'email',
+          emailRegex,
+          () => 'default@example.com',
+        ),
         'test@example.com',
       );
       expect(
         getStringRegexpPropOrDefaultFunction(
-            map, 'invalid', alphaNumericRegex, () => 'default'),
+          map,
+          'invalid',
+          alphaNumericRegex,
+          () => 'default',
+        ),
         'default',
       );
     });
@@ -85,10 +102,10 @@ void main() {
     final numRegex = RegExp(r'^\d+$');
 
     test('getStringArrayRegexpPropOrThrow', () {
-      expect(
-        getStringArrayRegexpPropOrThrow(map, 'emails', emailRegex),
-        ['a@a.com', 'b@b.com'],
-      );
+      expect(getStringArrayRegexpPropOrThrow(map, 'emails', emailRegex), [
+        'a@a.com',
+        'b@b.com',
+      ]);
 
       // One invalid element should cause throw
       expect(
@@ -102,29 +119,35 @@ void main() {
       // I should probably implement it such that it throws if ANY element fails.
 
       // Numbers as strings
-      expect(
-        getStringArrayRegexpPropOrThrow(map, 'nums', numRegex),
-        ['123', '456'],
-      );
+      expect(getStringArrayRegexpPropOrThrow(map, 'nums', numRegex), [
+        '123',
+        '456',
+      ]);
     });
 
     test('getStringArrayRegexpPropOrDefault', () {
       expect(
-        getStringArrayRegexpPropOrDefault(
-            map, 'emails', emailRegex, ['default']),
+        getStringArrayRegexpPropOrDefault(map, 'emails', emailRegex, [
+          'default',
+        ]),
         ['a@a.com', 'b@b.com'],
       );
       expect(
-        getStringArrayRegexpPropOrDefault(
-            map, 'mixed', emailRegex, ['default']),
+        getStringArrayRegexpPropOrDefault(map, 'mixed', emailRegex, [
+          'default',
+        ]),
         ['default'],
       );
     });
 
     test('getStringArrayRegexpPropOrDefaultFunction', () {
-       expect(
+      expect(
         getStringArrayRegexpPropOrDefaultFunction(
-            map, 'mixed', emailRegex, () => ['default']),
+          map,
+          'mixed',
+          emailRegex,
+          () => ['default'],
+        ),
         ['default'],
       );
     });
