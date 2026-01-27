@@ -16,11 +16,16 @@ R getStringPropOrDefault<R extends String?>(
   String prop,
   R defaultValue,
 ) {
-  try {
-    return getStringPropOrThrow<R>(props, prop);
-  } catch (_) {
-    return defaultValue;
+  if (props != null) {
+    final v = props[prop];
+    if (v is String) {
+      return v as R;
+    }
+    if (v is num) {
+      return v.toString() as R;
+    }
   }
+  return defaultValue;
 }
 
 /// Retrieves a string property from a map, or returns the result of a default function if not found or type mismatch.
@@ -29,11 +34,16 @@ R getStringPropOrDefaultFunction<R extends String?>(
   String prop,
   R Function() defaultFunction,
 ) {
-  try {
-    return getStringPropOrThrow<R>(props, prop);
-  } catch (_) {
-    return defaultFunction();
+  if (props != null) {
+    final v = props[prop];
+    if (v is String) {
+      return v as R;
+    }
+    if (v is num) {
+      return v.toString() as R;
+    }
   }
+  return defaultFunction();
 }
 
 /// Retrieves a string property from a map, or throws an error if not found or type mismatch.
