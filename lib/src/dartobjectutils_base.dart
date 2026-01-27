@@ -430,16 +430,26 @@ List<String> getStringArrayRegexpPropOrThrow(
   RegExp regexp, {
   String? message,
 }) {
-  final list = getStringArrayPropOrThrow(props, prop, message: message);
-  for (final val in list) {
-    if (!regexp.hasMatch(val)) {
-      throw MissingOrInvalidPropertyException(
-        message ??
-            '$prop element "$val" does not match pattern ${regexp.pattern} in ${props.runtimeType}',
-      );
+  if (props != null) {
+    if (props.containsKey(prop)) {
+      final v = props[prop];
+      if (v is List) {
+        return v.map((e) {
+          final val = e.toString();
+          if (!regexp.hasMatch(val)) {
+            throw MissingOrInvalidPropertyException(
+              message ??
+                  '$prop element "$val" does not match pattern ${regexp.pattern} in ${props.runtimeType}',
+            );
+          }
+          return val;
+        }).toList();
+      }
     }
   }
-  return list;
+  throw MissingOrInvalidPropertyException(
+    message ?? '$prop not found as string[] in ${props.runtimeType}',
+  );
 }
 
 // --- Date Array ---
