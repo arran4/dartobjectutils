@@ -16,11 +16,16 @@ R getStringPropOrDefault<R extends String?>(
   String prop,
   R defaultValue,
 ) {
-  try {
-    return getStringPropOrThrow<R>(props, prop);
-  } catch (_) {
-    return defaultValue;
+  if (props != null) {
+    final v = props[prop];
+    if (v is String) {
+      return v as R;
+    }
+    if (v is num) {
+      return v.toString() as R;
+    }
   }
+  return defaultValue;
 }
 
 /// Retrieves a string property from a map, or returns the result of a default function if not found or type mismatch.
@@ -29,11 +34,16 @@ R getStringPropOrDefaultFunction<R extends String?>(
   String prop,
   R Function() defaultFunction,
 ) {
-  try {
-    return getStringPropOrThrow<R>(props, prop);
-  } catch (_) {
-    return defaultFunction();
+  if (props != null) {
+    final v = props[prop];
+    if (v is String) {
+      return v as R;
+    }
+    if (v is num) {
+      return v.toString() as R;
+    }
   }
+  return defaultFunction();
 }
 
 /// Retrieves a string property from a map, or throws an error if not found or type mismatch.
@@ -927,6 +937,8 @@ List<bool> getBooleanArrayPropOrThrow(
 
 // --- Enum ---
 
+String _defaultEnumKeyExtractor(Object e) => e.toString().split('.').last;
+
 T getEnumPropOrThrow<T extends Object>(
   Map<String, dynamic>? props,
   String prop,
@@ -938,7 +950,7 @@ T getEnumPropOrThrow<T extends Object>(
     if (props.containsKey(prop)) {
       final v = props[prop];
       try {
-        final extractor = keyExtractor ?? (e) => e.toString().split('.').last;
+        final extractor = keyExtractor ?? _defaultEnumKeyExtractor;
         return values.firstWhere((e) => extractor(e) == v);
       } catch (_) {
         // Fall through to throw
@@ -989,8 +1001,7 @@ List<T> getEnumArrayPropOrThrow<T extends Object>(
     if (props.containsKey(prop)) {
       final v = props[prop];
       if (v is List) {
-        final extractor =
-            keyExtractor ?? (val) => val.toString().split('.').last;
+        final extractor = keyExtractor ?? _defaultEnumKeyExtractor;
         return v.map((e) {
           try {
             return values.firstWhere((val) => extractor(val) == e);
