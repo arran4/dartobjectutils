@@ -336,9 +336,10 @@ DateTime getDatePropOrThrow(Map<String, dynamic>? props, String prop) {
       if (v is DateTime) {
         return v;
       } else if (v is String) {
-        try {
-          return DateTime.parse(v);
-        } catch (_) {}
+        final d = DateTime.tryParse(v);
+        if (d != null) {
+          return d;
+        }
       } else if (v is num) {
         // Assumes seconds if small? TS says: new Date((v as number) * 1000)
         // JS Date constructor with number is milliseconds.
