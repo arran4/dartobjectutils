@@ -1,6 +1,6 @@
 name: dartobjectutils
 description: A Dart library designed to help safely extract values from untyped objects.
-version: 0.1.1
+version: 0.1.2
 repository: https://github.com/arran4/dartobjectutils
 
 environment:
