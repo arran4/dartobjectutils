@@ -72,8 +72,18 @@ jobs:
           git checkout main
           git pull origin main
 
-          CURRENT_VERSION=$(awk '/^version:/ {print $2}' pubspec.yaml)
-          echo "Current version: $CURRENT_VERSION"
+          PUBSPEC_VERSION=$(awk '/^version:/ {print $2}' pubspec.yaml)
+          echo "Pubspec version: $PUBSPEC_VERSION"
+
+          git fetch --tags
+          HIGHEST_TAG=$(git tag -l "v*" | sed 's/^v//' | sort -V | tail -n 1)
+          if [ -z "$HIGHEST_TAG" ]; then
+             HIGHEST_TAG="0.0.0"
+          fi
+          echo "Highest tag: $HIGHEST_TAG"
+
+          CURRENT_VERSION=$(echo -e "$PUBSPEC_VERSION\n$HIGHEST_TAG" | sort -V | tail -n 1)
+          echo "Base version for increment: $CURRENT_VERSION"
 
           if [ "$INCREMENT" == "manual" ]; then
              if [ -z "$MANUAL_VERSION_INPUT" ]; then
