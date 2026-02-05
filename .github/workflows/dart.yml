@@ -7,9 +7,26 @@ on:
       - 'v*'
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      increment:
+        description: 'Version increment'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - manual
+      manual_version:
+        description: 'Manual version (if increment is manual)'
+        required: false
+        type: string
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   test:
@@ -31,13 +48,84 @@ jobs:
 
   release:
     needs: test
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
-      - name: Update Pubspec Version
+        with:
+          fetch-depth: 0
+
+      - name: Prepare Release (Manual Dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INCREMENT: ${{ inputs.increment }}
+          MANUAL_VERSION_INPUT: ${{ inputs.manual_version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Ensure we are on main
+          git checkout main
+          git pull origin main
+
+          CURRENT_VERSION=$(awk '/^version:/ {print $2}' pubspec.yaml)
+          echo "Current version: $CURRENT_VERSION"
+
+          if [ "$INCREMENT" == "manual" ]; then
+             if [ -z "$MANUAL_VERSION_INPUT" ]; then
+                echo "Error: Manual version is required when increment is set to 'manual'."
+                exit 1
+             fi
+             NEW_VERSION="$MANUAL_VERSION_INPUT"
+          else
+             IFS='.' read -r -a parts <<< "$CURRENT_VERSION"
+             MAJOR="${parts[0]}"
+             MINOR="${parts[1]}"
+             PATCH="${parts[2]}"
+
+             if [ "$INCREMENT" == "major" ]; then
+               MAJOR=$((MAJOR + 1))
+               MINOR=0
+               PATCH=0
+             elif [ "$INCREMENT" == "minor" ]; then
+               MINOR=$((MINOR + 1))
+               PATCH=0
+             else
+               PATCH=$((PATCH + 1))
+             fi
+             NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          fi
+
+          echo "Calculated new version: $NEW_VERSION"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+          # Create release branch
+          BRANCH_NAME="release/v$NEW_VERSION"
+          git checkout -b "$BRANCH_NAME"
+
+          # Update pubspec
+          sed -i "s/^version: .*/version: $NEW_VERSION/" pubspec.yaml
+
+          # Commit
+          git add pubspec.yaml
+          git commit -m "Bump version to $NEW_VERSION"
+
+          # Tag
+          git tag "v$NEW_VERSION"
+
+          # Push Tag
+          git push origin "v$NEW_VERSION"
+
+          # Push Branch and Create PR
+          git push origin "$BRANCH_NAME"
+          gh pr create --title "Bump version to $NEW_VERSION" --body "Automated version bump to $NEW_VERSION" --base main
+
+      - name: Verify/Update Pubspec (Tag Trigger)
+        if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -80,3 +168,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
+          tag_name: ${{ env.NEW_VERSION && format('v{0}', env.NEW_VERSION) || '' }}
